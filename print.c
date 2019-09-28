@@ -1,4 +1,5 @@
 #include "print.h"
+#include "debug.h"
 #include <stdarg.h>
 #include <string.h>
 
@@ -31,9 +32,3 @@ void print(const char *fmt, ...)
     va_end(ap);
 }
 
-int main()
-{
-    //HERE_OFF;
-    print("sn", "test1");
-    print("dsfn", 10, "test2", 1.10);
-}
