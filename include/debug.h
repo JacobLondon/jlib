@@ -1,5 +1,5 @@
-#ifndef JLIB_PRINT_H
-#define JLIB_PRINT_H
+#ifndef JLIB_DEBUG_H
+#define JLIB_DEBUG_H
 
 extern int HERE_PASS;
 #define HERE_OFF HERE_PASS = 0
@@ -9,4 +9,4 @@ extern int HERE_PASS;
     if (HERE_PASS) \
         fprintf(stderr, "%s:%s:%d: Here %d\n", __FILE__, __func__, __LINE__, num)
 
-#endif // JLIB_PRINT_H
+#endif // JLIB_DEBUG_H

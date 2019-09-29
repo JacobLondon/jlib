@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "allocator.h"
+#include "../include/allocator.h"
 
 struct data {
     allocator *alloc;
@@ -37,7 +37,7 @@ static struct data *data_init()
     return self;
 }
 
-int main()
+void allocator_test()
 {
     struct data *d = data_init();
 
