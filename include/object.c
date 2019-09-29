@@ -11,7 +11,7 @@ object *object_init()
 
 int object_new(void *buf)
 {
-    object *self = (object *)(buf);
+    object *self = (object *)buf;
     self->buf = NULL;
     return 1;
 }
@@ -21,12 +21,12 @@ int object_del(void *buf)
     if (!buf)
         return 1;
     
-    object *self = (object *)(buf);
+    object *self = (object *)buf;
     if (self->buf)
         free(self->buf);
     if (self->alloc)
         allocator_free(self->alloc);
     free(buf);
-    
+
     return 1;
 }

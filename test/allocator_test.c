@@ -9,14 +9,14 @@ struct data {
 
 static int data_new(void *buf)
 {
-    struct data *self = (struct data *)(buf);
+    struct data *self = (struct data *)buf;
     self->d = calloc(8, sizeof(int));
     return 1;
 }
 
 static int data_del(void *buf)
 {
-    struct data *self = (struct data *)(buf);
+    struct data *self = (struct data *)buf;
     for (int i = 0; i < 8; i++)
         self->d[i] = 0;
     
