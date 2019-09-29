@@ -29,7 +29,7 @@ static int data_del(void *buf)
     return 1;
 }
 
-static struct data *data_construct()
+static struct data *data_init()
 {
     struct data *self = malloc(sizeof(struct data));
     self->alloc = allocator_init(data_new, data_del);
@@ -39,7 +39,7 @@ static struct data *data_construct()
 
 int main()
 {
-    struct data *d = data_construct();
+    struct data *d = data_init();
 
     d->d[0] = 10;
     for (int i = 0; i < 8; i++)
