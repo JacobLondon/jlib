@@ -9,7 +9,7 @@ void print(const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    for (; *fmt; *fmt++) {
+    for (; *fmt; fmt++) {
         switch (*fmt) {
         case 'd':
             printf("%d ", va_arg(ap, int));
@@ -32,3 +32,12 @@ void print(const char *fmt, ...)
     va_end(ap);
 }
 
+/**
+ * test
+ */
+
+void print_test()
+{
+    print("sn", "test1");
+    print("dsfn", 10, "test2", 1.10);
+}
