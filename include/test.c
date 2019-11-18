@@ -12,7 +12,14 @@
     if (fn(search, value)) \
         enclosed \
     else \
-        match1(fn, search, ...); \
+        match1(fn, search, __VA_ARGS__); \
+} while (0)
+
+#define match3(fn, search, value, enclosed, ...) do { \
+    if (fn(search, value)) \
+        enclosed \
+    else \
+        match2(fn, search, __VA_ARGS__); \
 } while (0)
 
 #define match(fn, search, value1, enclosed1, value2, enclosed2) do { \
@@ -27,7 +34,7 @@ static int cmpstr(char *a, char *b) { return strcmp(a, b) == 0; }
 
 int main()
 {
-    
+    /*
     match(cmpnum, 10,
     5, {
         printf("10 == 5!\n");
@@ -43,23 +50,21 @@ int main()
     "wwwwwwooooww", {
         printf("wwwwwwooooww == wwwwwwooooww\n");
     });
+    */
     
-    /*
-    match2(cmpnum, 10,
+    match3(cmpnum, 10,
     5, {
-        printf("2\n");
+        printf("1\n");
     },
     10, {
-        printf("1\n");
-    });
-
-    match1(cmpnum, 10,
-    10, {
+        printf("2\n");
+    },
+    11, {
         printf("3\n");
     });
-    */
+
 
     //print_test();
-    allocator_test();
+    //allocator_test();
     //vector_test();
 }
