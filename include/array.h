@@ -1,5 +1,5 @@
-#ifndef CENG_ARRAY_H_
-#define CENG_ARRAY_H_
+#ifndef JLIB_ARRAY_H
+#define JLIB_ARRAY_H
 
 #include <stdlib.h> // size_t
 
@@ -13,9 +13,16 @@ typedef struct array_s {
     size_t size;
 } Array;
 
+struct array_fn_s {
+    Array *(* new)(void (* free_fn)(void *buf));
+    void (* free)(Array *self);
+    void (* push)(Array *self, void *value);
+    void (* pop)(Array *self);
+};
+
 Array *array_new(void (* free_fn)(void *buf));
 void array_free(Array *self);
 void array_push(Array *self, void *value);
 void array_pop(Array *self);
 
-#endif // CENG_ARRAY_H_
+#endif // JLIB_ARRAY_H

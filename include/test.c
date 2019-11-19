@@ -2,69 +2,39 @@
 
 #include "jlib.h"
 
-#define match1(fn, search, value, enclosed) do { \
-    if (fn(search, value)) \
-        enclosed \
-    else {} \
-} while (0)
-
-#define match2(fn, search, value, enclosed, ...) do { \
-    if (fn(search, value)) \
-        enclosed \
-    else \
-        match1(fn, search, __VA_ARGS__); \
-} while (0)
-
-#define match3(fn, search, value, enclosed, ...) do { \
-    if (fn(search, value)) \
-        enclosed \
-    else \
-        match2(fn, search, __VA_ARGS__); \
-} while (0)
-
-#define match(fn, search, value1, enclosed1, value2, enclosed2) do { \
-    if (fn(search, value1)) \
-        enclosed1 \
-    else if (fn(search, value2)) \
-        enclosed2 \
-} while (0)
-
 static int cmpnum(int a, int b) { return a == b; }
 static int cmpstr(char *a, char *b) { return strcmp(a, b) == 0; }
 
+static void test_match()
+{
+   match(3, cmpstr, "match!",
+   "skip", {
+       printf("1\n");
+   },
+   "match!", {
+       printf("2\n");
+   },
+   "ignored", {
+       printf("3\n");
+   });
+}
+
+static void array_test()
+{
+    jlib_init();
+
+    #define array jlib.array
+
+    Array *a = array.new(NULL);
+    int b = 10;
+    array.push(a, ref(b));
+
+    printf("%d\n", val(a->buf[0], int));
+    array.free(a);
+}
+
 int main()
 {
-    /*
-    match(cmpnum, 10,
-    5, {
-        printf("10 == 5!\n");
-    },
-    10, {
-        printf("10 == 19\n");
-    });
-
-    match(cmpstr, "wwwwwwooooww",
-    "nope", {
-        printf("wwwwwwooooww == nope\n");
-    },
-    "wwwwwwooooww", {
-        printf("wwwwwwooooww == wwwwwwooooww\n");
-    });
-    */
-    
-    match3(cmpnum, 10,
-    5, {
-        printf("1\n");
-    },
-    10, {
-        printf("2\n");
-    },
-    11, {
-        printf("3\n");
-    });
-
-
-    //print_test();
-    //allocator_test();
-    //vector_test();
+    array_test();
+    test_match();
 }
