@@ -6,31 +6,37 @@ void print(const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    for (; *fmt; fmt++) {
-        switch (*fmt) {
-        case 'd':
-            printf("%d ", va_arg(ap, int));
-            break;
-        case 'f':
-            printf("%lf ", va_arg(ap, double));
-            break;
-        case 'n':
-            printf("\n");
-            break;
-        case 's':
-            printf("%s ", va_arg(ap, char *));
-            break;
-        }
-    }
+    printf(fmt, ap);
     va_end(ap);
 }
 
-/**
- * test
- */
-
-void print_test()
+void println(const char *fmt, ...)
 {
-    print("sn", "test1");
-    print("dsfn", 10, "test2", 1.10);
+    va_list ap;
+    va_start(ap, fmt);
+    printf(fmt, ap);
+    va_end(ap);
+    printf("\n");
+}
+
+void newline()
+{
+    printf("\n");
+}
+
+void fprint(FILE *const stream, const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    fprintf(stream, fmt, ap);
+    va_end(ap);
+}
+
+void fprintln(FILE *const stream, const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    fprintf(stream, fmt, ap);
+    va_end(ap);
+    fprintf(stream, "\n");
 }

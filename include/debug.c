@@ -4,6 +4,6 @@
 
 void halt(char *message)
 {
-    fprintf(stderr, "%s\n", message);
+    fprintf(stderr, "Error: %s\n", message);
     exit(-1);
 }

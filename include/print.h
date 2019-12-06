@@ -4,7 +4,10 @@
 #include <stdio.h>
 
 void print(const char *fmt, ...);
+void println(const char *fmt, ...);
+void newline();
 
-void print_test();
+void fprint(FILE *const stream, const char *fmt, ...);
+void fprintln(FILE *const stream, const char *fmt, ...);
 
 #endif // JLIB_PRINT_H
