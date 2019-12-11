@@ -4,9 +4,9 @@
 #include "array.h"
 #include "debug.h"
 
-Array array_new(void (* f_free)(void *buf))
+Array *array_new(void (* f_free)(void *buf))
 {
-    Array self;
+    Array *self;
     if (!(self = malloc(sizeof(struct array_s))))
         halt("Could not malloc for array initialization");
     if (!(self->buf = malloc(sizeof(void *) * ARRAY_DEFAULT_CAP)))
@@ -18,7 +18,7 @@ Array array_new(void (* f_free)(void *buf))
     return self;
 }
 
-void array_free(Array self)
+void array_free(Array *self)
 {
     if (!self)
         return;
@@ -36,7 +36,7 @@ Skip:
     free(self);
 }
 
-void array_push(Array self, void *value)
+void array_push(Array *self, void *value)
 {
     // realloc for more space
     if (self->size == self->cap) {
@@ -47,13 +47,13 @@ void array_push(Array self, void *value)
     *(self->buf + self->size++) = value;
 }
 
-void array_pop(Array self)
+void array_pop(Array *self)
 {
     if (self->size > 0)
         self->size--;
 }
 
-void array_resize(Array self, size_t size)
+void array_resize(Array *self, size_t size)
 {
     if (!(self->buf = realloc(self->buf, size)))
         halt("Could not realloc array buffer");

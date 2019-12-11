@@ -2,7 +2,7 @@
 #include <string.h>
 #include "print.h"
 
-void print(const char *fmt, ...)
+void print(const char *__restrict__ fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -10,7 +10,7 @@ void print(const char *fmt, ...)
     va_end(ap);
 }
 
-void println(const char *fmt, ...)
+void println(const char *__restrict__ fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -24,7 +24,7 @@ void newline()
     printf("\n");
 }
 
-void fprint(FILE *const stream, const char *fmt, ...)
+void fprint(FILE *__restrict__ stream, const char *__restrict__ fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -32,7 +32,7 @@ void fprint(FILE *const stream, const char *fmt, ...)
     va_end(ap);
 }
 
-void fprintln(FILE *const stream, const char *fmt, ...)
+void fprintln(FILE *__restrict__ stream, const char *__restrict__ fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);

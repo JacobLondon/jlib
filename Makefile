@@ -1,8 +1,8 @@
 TARGET=jlibtest
 CC=clang
-CFLAGS=-ggdb -std=c11 -O2
+CFLAGS=-std=c11 -O2
 
-OBJ_FILES=include/allocator.o include/array.o include/debug.o include/jlib.o include/print.o \
+OBJ_FILES=include/array.o include/debug.o include/generic.o include/map.o include/print.o \
 	include/test.o
 
 .PHONY: clean

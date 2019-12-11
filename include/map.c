@@ -10,9 +10,9 @@
  * node
  */
 
-Node node_init(char *key, void *value)
+Node *node_init(char *key, void *value)
 {
-    Node self;
+    Node *self;
     if (!(self = malloc(sizeof(struct node_s))))
         halt("Could not malloc for node initialization");
     if (!(self->key = malloc((1 + strlen(key)) * sizeof(char))))
@@ -23,7 +23,7 @@ Node node_init(char *key, void *value)
     return self;
 }
 
-void node_free(Node self)
+void node_free(Node *self)
 {
     delete(self->key, free);
     delete(self, free);
@@ -33,9 +33,9 @@ void node_free(Node self)
  * map
  */
 
-Map map_new(void (* f_free)(void *buf))
+Map *map_new(void (* f_free)(void *buf))
 {
-    Map self;
+    Map *self;
     if (!(self = malloc(sizeof(struct map_s))))
         halt("Could not malloc for map initialization");
     self->buckets = array_new(node_free);
@@ -43,31 +43,32 @@ Map map_new(void (* f_free)(void *buf))
     self->size = 0;
     self->free = f_free;
 
-    // vector to track an array of vector pointers
+    // array to track an array of array pointers
     for (int i = 0; i < MAP_DEFAULT_CAP; i++)
         bucket_at(self, i) = NULL;
 
     return self;
 }
 
-void map_insert(Map self, Node n)
+void map_insert(Map *self, Node *n)
 {
     size_t index = fnv1a(n->key, self->cap);
 
     // the bucket hasn't been created yet
     if (bucket_at(self, index) == NULL)
         bucket_at(self, index) = array_new(self->free);
-    
-    // check if the key is in the bucket
-    for (size_t i = 0; i < bucket_at(self, index)->size; i++) {
-        // the key exists, replace it with the new node and exit
-        if (strcmp(n->key, node_at(self, index, i)->key) == 0) {
-            node_free(node_at(self, index, i));
-            node_at(self, index, i) = n;
-            return;
+    // bucket created already, check if the key is already in it
+    else {
+        // check if the key is in the bucket
+        for (size_t i = 0; i < bucket_at(self, index)->size; i++) {
+            // the key exists, replace it with the new node and exit
+            if (strcmp(n->key, node_at(self, index, i)->key) == 0) {
+                node_free(node_at(self, index, i));
+                node_at(self, index, i) = n;
+                return;
+            }
         }
     }
-    // else
 
     // append the node, a bucket must be there
     array_push(bucket_at(self, index), n);
@@ -82,7 +83,7 @@ void map_insert(Map self, Node n)
     }
 }
 
-Node map_at(Map self, char *key)
+Node *map_at(Map *self, char *key)
 {
     size_t index = fnv1a(key, self->cap);
 
@@ -98,10 +99,10 @@ Node map_at(Map self, char *key)
     return NULL;
 }
 
-void map_resize(Map self, size_t size)
+void map_resize(Map *self, size_t size)
 {
     // temporarily hold the nodes
-    Array temp = array_new(self->free);
+    Array *temp = array_new(self->free);
     size_t i, j;
 
     // traverse the map
@@ -112,7 +113,7 @@ void map_resize(Map self, size_t size)
 
         // traverse the bucket, record nodes
         for (j = 0; j < bucket_at(self, i)->size; j++) {
-            vector_append(temp, node_at(self, i, j));
+            array_push(temp, node_at(self, i, j));
         }
         
         // free the bucket, nodes stay in temp
@@ -131,13 +132,13 @@ void map_resize(Map self, size_t size)
     for (i = 0; i < temp->size; i++) {
         // correct for capacity++ in insert
         self->size--;
-        map_insert(self, ((Node *)temp->buf)[i]);
+        map_insert(self, ((Node **)temp->buf)[i]);
     }
 
     array_free(temp);
 }
 
-void map_free(Map self)
+void map_free(Map *self)
 {
     if (self == NULL)
         return;
@@ -179,54 +180,4 @@ size_t fnv1a(const char *text, size_t max)
     // 64 bit number into the range defined by max
     hash = hash % max;
     return hash;
-}
-
-/**
- * test
- */
-
-static char *rand_string(char *str, size_t size)
-{
-    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJK";
-    if (size) {
-        --size;
-        for (size_t n = 0; n < size; n++) {
-            int key = rand() % (int) (sizeof charset - 1);
-            str[n] = charset[key];
-        }
-        str[size] = '\0';
-    }
-    return str;
-}
-
-static map_test()
-//void main()
-{
-    Map m = map_init(NULL);
-    char a = 'a';
-
-    map_insert(m, node_init("aaaa", pointer_to(a)));
-    map_insert(m, node_init("aa2a", pointer_to(a)));
-    map_insert(m, node_init("aa12a", pointer_to(a)));
-    map_insert(m, node_init("aaaa", pointer_to(a)));
-    map_insert(m, node_init("a43aaa", pointer_to(a)));
-    map_insert(m, node_init("aaaa", pointer_to(a)));
-    map_insert(m, node_init("aafasdaa", pointer_to(a)));
-    map_insert(m, node_init("aaaa", pointer_to(a)));
-    map_insert(m, node_init("aaadsaa", pointer_to(a)));
-    map_insert(m, node_init("afaaa", pointer_to(a)));
-    map_insert(m, node_init("adaadaaa", pointer_to(a)));
-
-    printf("capacity: %d\nsize: %d\n", m->cap, m->size);
-
-    Node n;
-    map_for_each(m, n) {
-        printf("Bucket %d:", __b);
-        node_print(n);
-    }
-
-    printf("aaaa: ");
-    printf("%d\n", val(map_at(m, "aaaa")->value, char));
-
-    map_free(m);
 }
