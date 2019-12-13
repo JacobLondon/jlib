@@ -2,13 +2,22 @@
 
 #include "jlib.h"
 
+static void stringify_test() {
+    char *test = hstring(1000);
+    buildstr(test, 10);
+    buildcat(test, "wow");
+    printf("test = %s\n", test);
+
+    char *lit = hstring_lit("1234567890");
+    printf("literal = %s\n", lit);
+}
+
 static void array_test()
 {
     Array *a = array_new(NULL);
     int b = 10;
-    array_push(a, ref(b));
-
-    printf("%d\n", val(a->buf[0], int));
+    array_push(a, b);
+    printf("%d\n", array_read(a, 0, int));
     array_free(a);
 }
 
@@ -31,7 +40,7 @@ static char *rand_string(char *str, size_t size)
     return str;
 }
 
-static map_test()
+static void map_test()
 {
     Map *m = map_new(NULL);
     char a = 'a';
@@ -66,5 +75,6 @@ int main()
 {
     //array_test();
     //test_match();
-    map_test();
+    //map_test();
+    stringify_test();
 }

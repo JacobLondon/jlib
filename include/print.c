@@ -1,5 +1,6 @@
 #include <stdarg.h>
 #include <string.h>
+
 #include "print.h"
 
 void print(const char *__restrict__ fmt, ...)

@@ -36,7 +36,7 @@ Skip:
     free(self);
 }
 
-void array_push(Array *self, void *value)
+void array_push_(Array *self, void *value)
 {
     // realloc for more space
     if (self->size == self->cap) {

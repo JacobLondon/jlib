@@ -3,11 +3,11 @@
 
 #include <stdio.h>
 
-void print(const char *fmt, ...);
-void println(const char *fmt, ...);
+void print(const char *__restrict__ fmt, ...);
+void println(const char *__restrict__ fmt, ...);
 void newline();
 
-void fprint(FILE *const stream, const char *fmt, ...);
-void fprintln(FILE *const stream, const char *fmt, ...);
+void fprint(FILE *__restrict__ const stream, const char *__restrict__ fmt, ...);
+void fprintln(FILE *__restrict__ const stream, const char *__restrict__ fmt, ...);
 
 #endif // JLIB_PRINT_H

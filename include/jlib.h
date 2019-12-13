@@ -6,5 +6,6 @@
 #include "generic.h"
 #include "map.h"
 #include "print.h"
+#include "stringify.h"
 
 #endif // JLIB_JLIB_H
