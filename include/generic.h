@@ -6,7 +6,7 @@
 void *copy(void *buf, size_t size);
 void delete(void *buf, void (*f_free)(void *buf));
 
-#define ref(value) ((void*)&(value))
-#define val(voidptr, type) (*(type *)(voidptr))
+#define ref(Value) ((void*)&(Value))
+#define val(Voidptr, Type) (*(Type *)(Voidptr))
 
 #endif // JLIB_GENERIC_H

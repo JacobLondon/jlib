@@ -23,8 +23,8 @@ void array_push_(Array *self, void *value);
 void array_pop(Array *self);
 void array_resize(Array *self, size_t size);
 
-#define array_push(arrayptr, valueptr) array_push_((arrayptr), ref((valueptr)))
-#define array_read(arrayptr, index, type) (val((arrayptr)->buf[(index)], type))
-#define array_write(arrayptr, index, valueptr) do { (arrayptr)->buf[(index)] = ref((valueptr)); } while (0)
+#define array_push(Arrayptr, Valueptr) array_push_((Arrayptr), ref((Valueptr)))
+#define array_read(Arrayptr, Index, Type) (val((Arrayptr)->buf[(Index)], Type))
+#define array_write(Arrayptr, Index, Valueptr) do { (Arrayptr)->buf[(Index)] = ref((Valueptr)); } while (0)
 
 #endif // JLIB_ARRAY_H

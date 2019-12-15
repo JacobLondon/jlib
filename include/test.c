@@ -2,11 +2,16 @@
 
 #include "jlib.h"
 
-static void stringify_test() {
+static void stringify_test()
+{
     char *test = hstring(1000);
-    buildstr(test, 10);
+
+    buildstr(test, "ok");
+    buildstr(test, "ok");
+    buildstr(test, "ok");
+
     buildcat(test, "wow");
-    printf("test = %s\n", test);
+    println("test = %s", test);
 
     char *lit = hstring_lit("1234567890");
     printf("literal = %s\n", lit);

@@ -5,13 +5,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define streq(str1, str2) (strcmp(str1, str2) == 0)
+#define streq(Str1, Str2) (strcmp(Str1, Str2) == 0)
 
 /**
  * Heap allocated string shortcuts
  */
 
-#define hstring(size) calloc(size, sizeof(char))
+#define hstring(Size) calloc(Size, sizeof(char))
 char *hstring_lit(const char *literal);
 
 /**
@@ -19,14 +19,18 @@ char *hstring_lit(const char *literal);
  */
 
 #define BUILD_MAX 256U
+// option to use spaces between build strings
+#ifndef BUILD_SEP
+# define BUILD_SEP " "
+#endif
 void build_concat(char *target, void *src, size_t size);
 
-#define BUILD_LOOKUP(type, spec)                   \
-inline void build_##spec(char *string, type value) \
-{                                                  \
-    char tmp[BUILD_MAX] = {0};                     \
-    snprintf(tmp, BUILD_MAX, "%" #spec, value);    \
-    build_concat(string, tmp, strlen(tmp));        \
+#define BUILD_LOOKUP(Type, Spec)                          \
+inline void build_##Spec(char *string, Type value)        \
+{                                                         \
+    char tmp[BUILD_MAX] = {0};                            \
+    snprintf(tmp, BUILD_MAX, "%" #Spec BUILD_SEP, value); \
+    build_concat(string, tmp, strlen(tmp));               \
 }
 
 BUILD_LOOKUP(char, c)
@@ -40,8 +44,8 @@ BUILD_LOOKUP(float, f)
 BUILD_LOOKUP(double, lf)
 BUILD_LOOKUP(char *, s)
 
-#define buildstr(string, value)            \
-    _Generic ((value),                     \
+#define buildstr(String, Value)            \
+    _Generic ((Value),                     \
         char: build_c,                     \
         int: build_d,                      \
         unsigned int: build_u,             \
@@ -50,13 +54,13 @@ BUILD_LOOKUP(char *, s)
         long long int: build_lld,          \
         unsigned long long int: build_llu, \
         float: build_f,                    \
-        double: build_d,                   \
+        double: build_lf,                  \
         char *: build_s                    \
-    )(string, value)
+    )(String, Value)
 
 /**
  * Shortcut for catting a string with another string
  */
-#define buildcat(string1, string2) build_s(string1, (char *)string2)
+#define buildcat(String1, String2) build_s(String1, (char *)String2)
 
 #endif // JLIB_STRINGIFY_H
