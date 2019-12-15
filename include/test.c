@@ -6,9 +6,9 @@ static void stringify_test()
 {
     char *test = hstring(1000);
 
-    buildstr(test, "ok");
-    buildstr(test, "ok");
-    buildstr(test, "ok");
+    buildstr(test, (char *)"ok");
+    buildstr(test, (char *)"ok");
+    buildstr(test, (char *)"ok");
 
     buildcat(test, "wow");
     println("test = %s", test);
@@ -22,7 +22,7 @@ static void array_test()
     Array *a = array_new(NULL);
     int b = 10;
     array_push(a, b);
-    printf("%d\n", array_read(a, 0, int));
+    println("%d", array_read(a, 0, int));
     array_free(a);
 }
 

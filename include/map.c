@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "debug.h"
+#include "alloc.h"
 #include "generic.h"
 #include "map.h"
 
@@ -13,10 +13,8 @@
 Node *node_init(char *key, void *value)
 {
     Node *self;
-    if (!(self = malloc(sizeof(struct node_s))))
-        halt("Could not malloc for node initialization");
-    if (!(self->key = malloc((1 + strlen(key)) * sizeof(char))))
-        halt("Could not malloc map key");
+    try_malloc(self, sizeof(struct node_s), "Could not malloc for node initialization");
+    try_malloc(self->key, (1 + strlen(key)) * sizeof(char), "Could not malloc map key");
     strcpy(self->key, key);
     self->value = value;
     
@@ -25,8 +23,8 @@ Node *node_init(char *key, void *value)
 
 void node_free(Node *self)
 {
-    delete(self->key, free);
-    delete(self, free);
+    dealloc(self->key);
+    dealloc(self);
 }
 
 /**
@@ -36,8 +34,7 @@ void node_free(Node *self)
 Map *map_new(void (* f_free)(void *buf))
 {
     Map *self;
-    if (!(self = malloc(sizeof(struct map_s))))
-        halt("Could not malloc for map initialization");
+    try_malloc(self, sizeof(struct map_s), "Could not malloc for map initialization");
     self->buckets = array_new(node_free);
     self->cap = MAP_DEFAULT_CAP;
     self->size = 0;

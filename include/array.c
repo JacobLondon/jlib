@@ -2,15 +2,13 @@
 #include <stdio.h>
 
 #include "array.h"
-#include "debug.h"
+#include "alloc.h"
 
 Array *array_new(void (* f_free)(void *buf))
 {
     Array *self;
-    if (!(self = malloc(sizeof(struct array_s))))
-        halt("Could not malloc for array initialization");
-    if (!(self->buf = malloc(sizeof(void *) * ARRAY_DEFAULT_CAP)))
-        halt("Could not malloc array buffer");
+    try_malloc(self, sizeof(struct array_s), "Could not malloc for array initialization");
+    try_malloc(self->buf, sizeof(void *) * ARRAY_DEFAULT_CAP, "Could not malloc array buffer");
     self->size = 0;
     self->cap  = ARRAY_DEFAULT_CAP;
     self->free = f_free;
@@ -33,7 +31,7 @@ void array_free(Array *self)
     }
 
 Skip:
-    free(self);
+    dealloc(self);
 }
 
 void array_push_(Array *self, void *value)
@@ -55,6 +53,6 @@ void array_pop(Array *self)
 
 void array_resize(Array *self, size_t size)
 {
-    if (!(self->buf = realloc(self->buf, size)))
-        halt("Could not realloc array buffer");
+    void **tmp;
+    try_realloc(self->buf, tmp, size, "Could not realloc array buffer");
 }
