@@ -35,7 +35,7 @@ Map *map_new(void (* f_free)(void *buf))
 {
     Map *self;
     try_malloc(self, sizeof(struct map_s), "Could not malloc for map initialization");
-    self->buckets = array_new(node_free);
+    self->buckets = array_new(array_free);
     self->cap = MAP_DEFAULT_CAP;
     self->size = 0;
     self->free = f_free;
@@ -47,7 +47,7 @@ Map *map_new(void (* f_free)(void *buf))
     return self;
 }
 
-void map_insert(Map *self, Node *n)
+void map_insert_(Map *self, Node *n)
 {
     size_t index = fnv1a(n->key, self->cap);
 
@@ -99,7 +99,7 @@ Node *map_at(Map *self, char *key)
 void map_resize(Map *self, size_t size)
 {
     // temporarily hold the nodes
-    Array *temp = array_new(self->free);
+    Array *temp = array_new((void (*)(void *))node_free);
     size_t i, j;
 
     // traverse the map
@@ -129,7 +129,7 @@ void map_resize(Map *self, size_t size)
     for (i = 0; i < temp->size; i++) {
         // correct for capacity++ in insert
         self->size--;
-        map_insert(self, ((Node **)temp->buf)[i]);
+        map_insert_(self, ((Node **)temp->buf)[i]);
     }
 
     array_free(temp);

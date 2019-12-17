@@ -47,33 +47,35 @@ static char *rand_string(char *str, size_t size)
 
 static void map_test()
 {
-    Map *m = map_new(NULL);
+    Map *m = map_new(DEF_DEALLOC);
     char a = 'a';
+    map_insert(m, "aaaa", a);
+    map_insert(m, "aa2a", a);
+    map_insert(m, "aa12a", a);
+    map_insert(m, "aaaa", a);
+    map_insert(m, "a43aaa", a);
+    map_insert(m, "aaaa", a);
+    map_insert(m, "aafasdaa", a);
+    map_insert(m, "aaaa", a);
+    //map_insert(m, node_init("aaadsaa", ref(a)));
+    HERE(1);
+    //map_insert(m, node_init("afaaa", ref(a)));
+    //map_insert(m, node_init("adaadaaa", ref(a)));
 
-    map_insert(m, node_init("aaaa", ref(a)));
-    map_insert(m, node_init("aa2a", ref(a)));
-    map_insert(m, node_init("aa12a", ref(a)));
-    map_insert(m, node_init("aaaa", ref(a)));
-    map_insert(m, node_init("a43aaa", ref(a)));
-    map_insert(m, node_init("aaaa", ref(a)));
-    map_insert(m, node_init("aafasdaa", ref(a)));
-    map_insert(m, node_init("aaaa", ref(a)));
-    map_insert(m, node_init("aaadsaa", ref(a)));
-    map_insert(m, node_init("afaaa", ref(a)));
-    map_insert(m, node_init("adaadaaa", ref(a)));
-
-    printf("capacity: %d\nsize: %d\n", m->cap, m->size);
-
+    println("capacity: %ld\nsize: %ld\n", m->cap, m->size);
+    /*
     Node *n;
     map_for_each(m, n) {
-        printf("Bucket %d:", __b);
-        print("%s:\t%c", n->key, val(n->value, char));
+        printf("Bucket %ld:", __b);
+        printf("%s:\t%c", n->key, val(n->value, char));
     }
 
     printf("aaaa: ");
-    printf("%d\n", val(map_at(m, "aaaa")->value, char));
-
+    println("%c", val(map_at(m, "aaaa")->value, char));
+    */
+    HERE(2);
     map_free(m);
+    HERE(3);
 }
 
 int main()

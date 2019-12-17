@@ -7,7 +7,7 @@ extern int HERE_PASS;
 
 #define HERE(num) \
     if (HERE_PASS) \
-        fprintf(stderr, "%s:%s:%d: Here %ld\n", __FILE__, __func__, __LINE__, num)
+        fprintf(stderr, "%s:%s:%d: Here %d\n", __FILE__, __func__, __LINE__, num)
 
 void halt(char *message);
 

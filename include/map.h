@@ -2,6 +2,7 @@
 #define JLIB_MAP_H
 
 #include "array.h"
+#include "generic.h"
 
 /**
  * node
@@ -39,8 +40,8 @@ typedef struct map_s Map;
 #define node_at(map, bindex, nindex) \
     ((Node **)bucket_at((map), (bindex))->buf)[(nindex)]
 
-#define bucket_at(map, index) \
-    ((Array **)(map)->buckets->buf)[(index)]
+#define bucket_at(Mapptr, Index) \
+    ((Array **)((Mapptr)->buckets->buf))[(Index)]
 
 #define map_for_each(map, node) \
     for (size_t __b = 0; __b < (map)->size; __b++) \
@@ -54,8 +55,10 @@ typedef struct map_s Map;
 Map *map_new(void (* f_free)(void *buf));
 void map_free(Map *self);
 Node *map_at(Map *self, char *key);
-void map_insert(Map *self, Node *n);
+void map_insert_(Map *self, Node *n);
 void map_resize(Map *self, size_t size);
+
+#define map_insert(Mapptr, Key, Value) map_insert_(Mapptr, node_init(Key, ref(Value)))
 
 /**
  * hash
