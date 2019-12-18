@@ -2,23 +2,13 @@
 
 #include "jlib.h"
 
-static void stringify_test()
+static void array_test()
 {
-    char *test = hstring(1000);
-
-    buildstr(test, (char *)"ok");
-    buildstr(test, (char *)"ok");
-    buildstr(test, (char *)"ok");
-
-    buildcat(test, "wow");
-    println("test = %s", test);
-
-    char *lit = hstring_lit("1234567890");
-    printf("literal = %s\n", lit);
-
-    int a;
-    strtot(a, "10");
-    println("a = %d", a);
+    Array *a = array_new(NULL);
+    int b = 10;
+    array_push(a, b);
+    println("%d", array_read(a, 0, int));
+    array_free(a);
 }
 
 static void arg_test()
@@ -51,19 +41,6 @@ static void arg_test()
     println("%d\t%d\t%d", defs.count_num, defs.c, defs.v);
 }
 
-static void array_test()
-{
-    Array *a = array_new(NULL);
-    int b = 10;
-    array_push(a, b);
-    println("%d", array_read(a, 0, int));
-    array_free(a);
-}
-
-
-/**
- * test
- */
 
 static char *rand_string(char *str, size_t size)
 {
@@ -110,6 +87,25 @@ static void map_test()
     HERE(2);
     map_free(m);
     HERE(3);
+}
+
+static void stringify_test()
+{
+    char *test = hstring(1000);
+
+    buildstr(test, (char *)"ok");
+    buildstr(test, (char *)"ok");
+    buildstr(test, (char *)"ok");
+
+    buildcat(test, "wow");
+    println("test = %s", test);
+
+    char *lit = hstring_lit("1234567890");
+    printf("literal = %s\n", lit);
+
+    int a;
+    strtot(a, "10");
+    println("a = %d", a);
 }
 
 int main(int argc, char **argv)
