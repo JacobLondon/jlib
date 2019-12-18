@@ -15,6 +15,40 @@ static void stringify_test()
 
     char *lit = hstring_lit("1234567890");
     printf("literal = %s\n", lit);
+
+    int a;
+    strtot(a, "10");
+    println("a = %d", a);
+}
+
+static void arg_test()
+{
+    int argc = 4;
+    char *argv[4] = {
+        "--count",
+        "10",
+        "-c",
+        "-v",
+    };
+
+    struct def_s {
+        int count_num;
+        bool c;
+        bool v;
+    } defs;
+
+    // get args
+    defs.c = arg_check(argc, argv, "-c");
+    defs.v = arg_check(argc, argv, "-v");
+
+    char *tmp;
+    if ((tmp = arg_get(argc, argv, "--count")))
+        strtot(defs.count_num, tmp);
+    else
+        defs.count_num = 0;
+    
+    // print found args
+    println("%d\t%d\t%d", defs.count_num, defs.c, defs.v);
 }
 
 static void array_test()
@@ -78,10 +112,19 @@ static void map_test()
     HERE(3);
 }
 
-int main()
+int main(int argc, char **argv)
 {
-    //array_test();
-    //test_match();
-    //map_test();
-    stringify_test();
+    if (arg_check(argc, argv, "--array"))
+        array_test();
+    else if (arg_check(argc, argv, "--arg"))
+        arg_test();
+    else if (arg_check(argc, argv, "--map"))
+        map_test();
+    else if (arg_check(argc, argv, "--string"))
+        stringify_test();
+    else {
+        puts("Usage:\n--array\n--arg\n--map\n--string");
+    }
+
+    return 0;
 }

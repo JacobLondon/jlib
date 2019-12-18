@@ -2,6 +2,7 @@
 #define JLIB_JLIB_H
 
 #include "alloc.h"
+#include "arg.h"
 #include "array.h"
 #include "debug.h"
 #include "generic.h"

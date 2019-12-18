@@ -8,6 +8,27 @@
 #define streq(Str1, Str2) (strcmp(Str1, Str2) == 0)
 
 /**
+ * Strings to a given type
+ */
+
+#define strtot(Target, String) do {              \
+    Target = _Generic((Target),                  \
+        char: strtol,                            \
+        unsigned char: strtol,                   \
+        int: strtol,                             \
+        unsigned int: strtoul,                   \
+        long int: strtol,                        \
+        unsigned long int: strtoul,              \
+        long long int: strtoll,                  \
+        unsigned long long int: strtoull,        \
+        float: strtof,                           \
+        double: strtod,                          \
+        long double: strtod,                     \
+        default: build_d                         \
+    )(String, /* endptr */ NULL, /* base */ 10); \
+} while (0)
+
+/**
  * Heap allocated string shortcuts
  */
 
@@ -47,6 +68,7 @@ BUILD_LOOKUP(char *, s)
 #define buildstr(String, Value)            \
     _Generic ((Value),                     \
         char: build_c,                     \
+        unsigned char: build_c,            \
         int: build_d,                      \
         unsigned int: build_u,             \
         long int: build_ld,                \
@@ -55,7 +77,9 @@ BUILD_LOOKUP(char *, s)
         unsigned long long int: build_llu, \
         float: build_f,                    \
         double: build_lf,                  \
-        char *: build_s                    \
+        long double: build_lf,             \
+        char *: build_s,                   \
+        default: build_d                   \
     )(String, Value)
 
 /**
