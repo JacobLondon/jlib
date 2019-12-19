@@ -16,8 +16,5 @@ test.o: include/test.c
 jlib.a: $(OBJ_FILES)
 	ar rcs $@ $^
 
-static:
-
-
 clean:
 	rm -rf $(TARGET) $(OBJ_FILES) *.a *.o
