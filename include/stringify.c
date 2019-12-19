@@ -25,3 +25,14 @@ void build_concat(char *htarget, void *src, size_t size)
         htarget[start + i] = ((char *)src)[i];
     }
 }
+
+BUILD_LOOKUP(char, c)
+BUILD_LOOKUP(int, d)
+BUILD_LOOKUP(unsigned int, u)
+BUILD_LOOKUP(long int, ld)
+BUILD_LOOKUP(unsigned long int, lu)
+BUILD_LOOKUP(long long int, lld)
+BUILD_LOOKUP(unsigned long long int, llu)
+BUILD_LOOKUP(float, f)
+BUILD_LOOKUP(double, lf)
+BUILD_LOOKUP(char *, s)

@@ -46,6 +46,9 @@ char *hstring_lit(const char *literal);
 #endif
 void build_concat(char *target, void *src, size_t size);
 
+#define BUILD_LOOKUP_PROTO(Type, Spec) \
+    void build_##Spec(char *string, Type value)
+
 #define BUILD_LOOKUP(Type, Spec)                          \
 inline void build_##Spec(char *string, Type value)        \
 {                                                         \
@@ -54,16 +57,17 @@ inline void build_##Spec(char *string, Type value)        \
     build_concat(string, tmp, strlen(tmp));               \
 }
 
-BUILD_LOOKUP(char, c)
-BUILD_LOOKUP(int, d)
-BUILD_LOOKUP(unsigned int, u)
-BUILD_LOOKUP(long int, ld)
-BUILD_LOOKUP(unsigned long int, lu)
-BUILD_LOOKUP(long long int, lld)
-BUILD_LOOKUP(unsigned long long int, llu)
-BUILD_LOOKUP(float, f)
-BUILD_LOOKUP(double, lf)
-BUILD_LOOKUP(char *, s)
+
+BUILD_LOOKUP_PROTO(char, c);
+BUILD_LOOKUP_PROTO(int, d);
+BUILD_LOOKUP_PROTO(unsigned int, u);
+BUILD_LOOKUP_PROTO(long int, ld);
+BUILD_LOOKUP_PROTO(unsigned long int, lu);
+BUILD_LOOKUP_PROTO(long long int, lld);
+BUILD_LOOKUP_PROTO(unsigned long long int, llu);
+BUILD_LOOKUP_PROTO(float, f);
+BUILD_LOOKUP_PROTO(double, lf);
+BUILD_LOOKUP_PROTO(char *, s);
 
 #define buildstr(String, Value)            \
     _Generic ((Value),                     \
