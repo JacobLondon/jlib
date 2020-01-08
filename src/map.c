@@ -1,3 +1,5 @@
+#if 0
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -35,7 +37,7 @@ Map *map_new(void (* f_free)(void *buf))
 {
     Map *self;
     try_malloc(self, sizeof(struct map_s), "Could not malloc for map initialization");
-    self->buckets = array_new(array_free);
+    self->buckets = jlib_array_new(jlib_array_free);
     self->cap = MAP_DEFAULT_CAP;
     self->size = 0;
     self->free = f_free;
@@ -178,3 +180,5 @@ size_t fnv1a(const char *text, size_t max)
     hash = hash % max;
     return hash;
 }
+
+#endif

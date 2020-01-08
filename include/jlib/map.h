@@ -1,3 +1,5 @@
+#if 0
+
 #ifndef JLIB_MAP_H
 #define JLIB_MAP_H
 
@@ -67,3 +69,5 @@ void map_resize(Map *self, size_t size);
 size_t fnv1a(const char *text, size_t max);
 
 #endif // JLIB_MAP_H
+
+#endif

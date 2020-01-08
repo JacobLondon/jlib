@@ -1,6 +1,6 @@
-#include "arg.h"
+#include <jlib/arg.h>
 
-bool arg_check(int argc, char **argv, const char *arg)
+bool jlib_arg_check(int argc, char **argv, const char *arg)
 {
     for (int i = 0; i < argc; i++) {
         if (streq(argv[i], arg)) {
@@ -10,7 +10,7 @@ bool arg_check(int argc, char **argv, const char *arg)
     return false;
 }
 
-char *arg_get(int argc, char **argv, const char *arg)
+char *jlib_arg_get(int argc, char **argv, const char *arg)
 {
     for (int i = 0; i < argc; i++) {
         if (streq(argv[i], arg) && (i + 1 < argc)) {

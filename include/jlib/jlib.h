@@ -7,6 +7,7 @@
 #include "debug.h"
 #include "generic.h"
 #include "map.h"
+#include "math.h"
 #include "print.h"
 #include "stringify.h"
 

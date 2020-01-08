@@ -1,10 +1,9 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include "debug.h"
+#include <jlib/debug.h>
 
-int HERE_PASS = 1;
+int jlib_HerePass = 1;
 
-void halt(char *message)
+void jlib_halt(const char *message)
 {
     fprintf(stderr, "Error: %s\n", message);
     exit(-1);

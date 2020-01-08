@@ -1,14 +1,13 @@
 #include <string.h>
-
-#include "jlib.h"
+#include <jlib/jlib.h>
 
 static void array_test()
 {
-    Array *a = array_new(NULL);
+    Array *a = jlib_array_new(NULL);
     int b = 10;
-    array_push(a, b);
-    println("%d", array_read(a, 0, int));
-    array_free(a);
+    jlib_array_push(a, b);
+    println("%d", jlib_array_read(a, 0, int));
+    jlib_array_free(a);
 }
 
 static void arg_test()
@@ -28,12 +27,12 @@ static void arg_test()
     } defs;
 
     // get args
-    defs.c = arg_check(argc, argv, "-c");
-    defs.v = arg_check(argc, argv, "-v");
+    defs.c = jlib_arg_check(argc, argv, "-c");
+    defs.v = jlib_arg_check(argc, argv, "-v");
 
     char *tmp;
-    if ((tmp = arg_get(argc, argv, "--count")))
-        strtot(defs.count_num, tmp);
+    if ((tmp = jlib_arg_get(argc, argv, "--count")))
+        jlib_strtot(defs.count_num, tmp);
     else
         defs.count_num = 0;
     
@@ -56,6 +55,7 @@ static char *rand_string(char *str, size_t size)
     return str;
 }
 
+#if 0
 static void map_test()
 {
     Map *m = map_new(DEF_DEALLOC);
@@ -88,35 +88,36 @@ static void map_test()
     map_free(m);
     HERE(3);
 }
+#endif
 
 static void stringify_test()
 {
-    char *test = hstring(1000);
+    char *test = jlib_string_new(1000);
 
-    buildstr(test, (char *)"ok");
-    buildstr(test, (char *)"ok");
-    buildstr(test, (char *)"ok");
+    jlib_strcat(test, (char *)"ok");
+    jlib_strcat(test, (char *)"ok");
+    jlib_strcat(test, (char *)"ok");
 
-    buildcat(test, "wow");
+    jlib_strcat(test, "wow");
     println("test = %s", test);
 
-    char *lit = hstring_lit("1234567890");
+    char *lit = jlib_string_from("1234567890");
     printf("literal = %s\n", lit);
 
     int a;
-    strtot(a, "10");
+    jlib_strtot(a, "10");
     println("a = %d", a);
 }
 
 int main(int argc, char **argv)
 {
-    if (arg_check(argc, argv, "--array"))
+    if (jlib_arg_check(argc, argv, "--array"))
         array_test();
-    else if (arg_check(argc, argv, "--arg"))
+    else if (jlib_arg_check(argc, argv, "--arg"))
         arg_test();
-    else if (arg_check(argc, argv, "--map"))
-        map_test();
-    else if (arg_check(argc, argv, "--string"))
+    /*else if (arg_check(argc, argv, "--map"))
+        map_test();*/
+    else if (jlib_arg_check(argc, argv, "--string"))
         stringify_test();
     else {
         puts("Usage:\n--array\n--arg\n--map\n--string");
