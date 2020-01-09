@@ -1,6 +1,5 @@
-#include <stdint.h>
-
 #include <jlib/math.h>
+#include <jlib/util.h>
 
 float jlib_fast_sqrtf(float number)
 {
@@ -28,4 +27,70 @@ float jlib_fast_invsqrtf(float number)
     conv.i = 0x5f3759df - (conv.i >> 1);
     conv.f *= (threehalfs - (x2 * conv.f * conv.f ));
     return conv.f;
+}
+
+/**
+ * From Linux kernel int_pow.c
+ * 
+ * int_pow - computes the exponentiation of the given base and exponent
+ * @base: base which will be raised to the given power
+ * @exp: power to be raised to
+ *
+ * Computes: pow(base, exp), i.e. @base raised to the @exp power
+ */
+uint64_t int_pow(uint64_t base, unsigned int exp)
+{
+	uint64_t result = 1;
+
+	while (exp) {
+		if (exp & 1)
+			result *= base;
+		exp >>= 1;
+		base *= base;
+	}
+
+	return result;
+}
+
+/* If normalization is done by loops, the even/odd algorithm is a win. */
+unsigned long gcd(unsigned long a, unsigned long b)
+{
+	unsigned long r = a | b;
+
+	if (!a || !b)
+		return r;
+
+	/* Isolate lsbit of r */
+	r &= -r;
+
+	while (!(b & r))
+		b >>= 1;
+	if (b == r)
+		return r;
+
+	for (;;) {
+		while (!(a & r))
+			a >>= 1;
+		if (a == r)
+			return r;
+		if (a == b)
+			return a;
+
+		if (a < b)
+			jlib_swap(&a, &b);
+		a -= b;
+		a >>= 1;
+		if (a & r)
+			a += b;
+		a >>= 1;
+	}
+}
+
+/* Lowest common multiple */
+unsigned long lcm(unsigned long a, unsigned long b)
+{
+	if (a && b)
+		return (a / gcd(a, b)) * b;
+	else
+		return 0;
 }

@@ -43,6 +43,11 @@
 
 #define jlib_string_new(Size) calloc(Size, sizeof(char))
 char *jlib_string_from(const char *literal);
+int jlib_string_fast_eq(const char *str0, const char *str1);
+
+char *jlib_string_fread(const char *fname);
+void jlib_string_fwrite(const char *fname, const char *cstr);
+void jlib_string_fappend(const char *fname, const char *cstr);
 
 /**
  * Builder strings
@@ -55,9 +60,6 @@ char *jlib_string_from(const char *literal);
 #endif
 void jlib_string_concat(char *target, void *src, size_t size);
 
-
-#if __STDC_VERSION__ >= 201112L /* C11 support */
-
 #define JLIB_STRING_LOOKUP_PROTO(Type, Spec) \
     void _jlib_build_##Spec(char *string, Type value)
 
@@ -69,7 +71,6 @@ inline void _jlib_build_##Spec(char *string, Type value) \
     jlib_string_concat(string, tmp, strlen(tmp)); \
 }
 
-
 JLIB_STRING_LOOKUP_PROTO(char, c);
 JLIB_STRING_LOOKUP_PROTO(int, d);
 JLIB_STRING_LOOKUP_PROTO(unsigned int, u);
@@ -80,6 +81,8 @@ JLIB_STRING_LOOKUP_PROTO(unsigned long long int, llu);
 JLIB_STRING_LOOKUP_PROTO(float, f);
 JLIB_STRING_LOOKUP_PROTO(double, lf);
 JLIB_STRING_LOOKUP_PROTO(char *, s);
+
+#if __STDC_VERSION__ >= 201112L /* C11 support */
 
 #define jlib_strbuild(String, Value) \
     _Generic ((Value), \

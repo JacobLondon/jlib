@@ -1,5 +1,5 @@
 # J Lib
-C Library with utility functions
+C Library with utility functions. Some functions from the CPython and Linux projects.
 
 # Dependencies
 ```
