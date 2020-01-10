@@ -1,84 +1,84 @@
 #include <jlib/stringify.h>
-#include <jlib/alloc.h>
 
-char *jlib_string_from(const char *literal)
+char *strnew(const char *lit)
 {
-    size_t size = strlen(literal);
-    char *build = jlib_string_new(size + 1);
-    size_t i = 0;
-    while ((build[i] = literal[i]))
-        i++;
-    
-    return build;
+	char *build = calloc(strlen(lit) + 1, sizeof(char));
+	if (!build) {
+		fputs("Error: Could not calloc in strnew\n", stderr);
+		exit(-1);
+	}
+	size_t i;
+	for (i = 0; (build[i] = lit[i]); i++)
+		;
+	
+	return build;
 }
 
-void jlib_string_concat(char *target, void *src, size_t size)
+int streq(const char *cstr0, const char *cstr1)
 {
-    size_t start = strlen(target);
-    size_t length = start + size + 1;
-    
-    // realloc characters
-    char *tmp;
-    jlib_try_realloc(target, tmp, length, "Coult not realloc in build_concat");
-
-    for (size_t i = 0; i < size; i++) {
-        target[start + i] = ((char *)src)[i];
-    }
+	size_t i;
+	for (i = 0; cstr0[i] || cstr1[i]; i++) {
+		if (cstr0[i] != cstr1[i])
+			return 0;
+	}
+	return 1;
 }
 
-int jlib_string_fast_eq(const char *str0, const char *str1)
+char *file_read(const char *fname)
 {
-    for (size_t i = 0; str0[i] != '\0' || str1[i] != '\0'; i++) {
-        if (str0[i] != str1[i])
-            return 0;
-    }
-    return 1;
+	char *buf = NULL;
+	long length;
+	FILE *f = fopen(fname, "rb");
+
+	if (f) {
+		fseek(f, 0, SEEK_END);
+		length = ftell(f);
+		fseek(f, 0, SEEK_SET);
+		buf = malloc(length);
+		if (buf) {
+			fread(buf, 1, length, f);
+		}
+		fclose(f);
+	}
+	else {
+		fprintf(stderr, "Error: Could not open file for reading: %s", fname);
+		exit(-1);
+	}
+	return buf;
 }
 
-char *jlib_string_fread(const char *fname)
+void file_write(const char *fname, const char *cstr)
 {
-    char *buf = NULL;
-    long length;
-    FILE *f = fopen(fname, "rb");
-
-    if (f) {
-        fseek(f, 0, SEEK_END);
-        length = ftell(f);
-        fseek(f, 0, SEEK_SET);
-        buf = malloc(length);
-        if (buf) {
-            fread(buf, 1, length, f);
-        }
-        fclose(f);
-    }
-    return buf;
+	FILE *f = fopen(fname, "wb");
+	if (f) {
+		fputs(cstr, f);
+		fclose(f);
+	}
+	else {
+		fprintf(stderr, "Error: Could not open file for writing: %s", fname);
+		exit(-1);
+	}
 }
 
-void jlib_string_fwrite(const char *fname, const char *cstr)
+void file_append(const char *fname, const char *cstr)
 {
-    FILE *f = fopen(fname, "wb");
-    if (f) {
-        fputs(cstr, f);
-        fclose(f);
-    }
+	FILE *f = fopen(fname, "ab");
+	if (f) {
+		fputs(cstr, f);
+		fclose(f);
+	}
+	else {
+		fprintf(stderr, "Error: Could not open file for appending: %s", fname);
+		exit(-1);
+	}
 }
 
-void jlib_string_fappend(const char *fname, const char *cstr)
-{
-    FILE *f = fopen(fname, "ab");
-    if (f) {
-        fputs(cstr, f);
-        fclose(f);
-    }
-}
-
-JLIB_STRING_LOOKUP(char, c)
-JLIB_STRING_LOOKUP(int, d)
-JLIB_STRING_LOOKUP(unsigned int, u)
-JLIB_STRING_LOOKUP(long int, ld)
-JLIB_STRING_LOOKUP(unsigned long int, lu)
-JLIB_STRING_LOOKUP(long long int, lld)
-JLIB_STRING_LOOKUP(unsigned long long int, llu)
-JLIB_STRING_LOOKUP(float, f)
-JLIB_STRING_LOOKUP(double, lf)
-JLIB_STRING_LOOKUP(char *, s)
+CONCAT_LOOKUP(char, c)
+CONCAT_LOOKUP(int, d)
+CONCAT_LOOKUP(unsigned int, u)
+CONCAT_LOOKUP(long int, ld)
+CONCAT_LOOKUP(unsigned long int, lu)
+CONCAT_LOOKUP(long long int, lld)
+CONCAT_LOOKUP(unsigned long long int, llu)
+CONCAT_LOOKUP(float, f)
+CONCAT_LOOKUP(double, lf)

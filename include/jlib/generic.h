@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-#define jlib_ref(Value) ((void*)&(Value))
-#define jlib_val(Voidptr, Type) (*(Type *)(Voidptr))
+#define ref(Value) ((void*)&(Value))
+#define val(Voidptr, Type) (*(Type *)(Voidptr))
 
-#endif // JLIB_GENERIC_H
+#endif /* JLIB_GENERIC_H */

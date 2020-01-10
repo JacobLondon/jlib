@@ -1,21 +1,25 @@
+#include <string.h>
+
 #include <jlib/arg.h>
 
-bool jlib_arg_check(int argc, char **argv, const char *arg)
+int arg_check(int argc, char **argv, const char *arg)
 {
-    for (int i = 0; i < argc; i++) {
-        if (streq(argv[i], arg)) {
-            return true;
-        }
-    }
-    return false;
+	int i;
+	for (i = 0; i < argc; i++) {
+		if (strcmp(argv[i], arg) == 0) {
+			return 1;
+		}
+	}
+	return 0;
 }
 
-char *jlib_arg_get(int argc, char **argv, const char *arg)
+char *arg_get(int argc, char **argv, const char *arg)
 {
-    for (int i = 0; i < argc; i++) {
-        if (streq(argv[i], arg) && (i + 1 < argc)) {
-            return argv[i + 1];
-        }
-    }
-    return NULL;
+	int i;
+	for (i = 0; i < argc; i++) {
+		if ((strcmp(argv[i], arg) == 0) && (i + 1 < argc)) {
+			return argv[i + 1];
+		}
+	}
+	return NULL;
 }

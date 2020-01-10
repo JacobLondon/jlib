@@ -2,57 +2,75 @@
 #include <stdio.h>
 
 #include <jlib/array.h>
-#include <jlib/alloc.h>
 
-Array *jlib_array_new(void (* f_free)(void *buf))
+struct array_s *array_new(void (* f_free)(void *buf))
 {
-    Array *self;
-    jlib_try_malloc(self, sizeof(struct jlib_array_t), "Could not malloc for array initialization");
-    jlib_try_malloc(self->buf, sizeof(void *) * JLIB_ARRAY_DEFAULT_CAP, "Could not malloc array buffer");
-    self->size = 0;
-    self->cap  = JLIB_ARRAY_DEFAULT_CAP;
-    self->free = f_free;
+	struct array_s *self = malloc(sizeof(struct array_s));
 
-    return self;
+	if (!self) {
+		fputs("Error: Could not malloc for array init", stderr);
+		exit(-1);
+	}
+
+	self->buf = malloc(sizeof(void *) * ARRAY_DEFAULT_CAP);
+	if (!self->buf) {
+		fputs("Error: Could not malloc array buffer", stderr);
+		exit(-1);
+	}
+
+	self->size = 0;
+	self->cap  = ARRAY_DEFAULT_CAP;
+	self->free = f_free;
+
+	return self;
 }
 
-void jlib_array_free(Array *self)
+void array_free(struct array_s *self)
 {
-    if (!self)
-        return;
+	if (!self)
+		return;
 
-    if (!(self->buf && self->free))
-        goto Skip;
+	if (!(self->buf && self->free))
+		goto Skip;
 
-    for (size_t i = 0; i < self->size; i++) {
-        if (*(self->buf + i)) {
-            self->free(*(self->buf + i));
-        }
-    }
+	size_t i;
+	for (i = 0; i < self->size; i++) {
+		if (*(self->buf + i)) {
+			self->free(*(self->buf + i));
+		}
+	}
 
 Skip:
-    free(self);
+	free(self);
 }
 
-void jlib_array_push_(Array *self, void *value)
+void array_push_(struct array_s *self, void *value)
 {
-    // realloc for more space
-    if (self->size == self->cap) {
-        self->cap = self->cap * JLIB_ARRAY_DEFAULT_SCALING;
-        jlib_array_resize(self, self->cap);
-    }
+	/* realloc for more space */
+	if (self->size == self->cap) {
+		self->cap = self->cap * ARRAY_DEFAULT_SCALING;
+		array_resize(self, self->cap);
+	}
 
-    *(self->buf + self->size++) = value;
+	*(self->buf + self->size++) = value;
 }
 
-void jlib_array_pop(Array *self)
+void array_pop(struct array_s *self)
 {
-    if (self->size > 0)
-        self->size--;
+	if (self->size > 0)
+		self->size--;
 }
 
-void jlib_array_resize(Array *self, size_t size)
+void array_resize(struct array_s *self, size_t size)
 {
-    void **tmp;
-    jlib_try_realloc(self->buf, tmp, size, "Could not realloc array buffer");
+	void **tmp = realloc(self->buf, size);
+	if (!tmp) {
+		fputs("Error: Could not realloc array buffer", stderr);
+		exit(-1);
+	}
+
+	self->buf = tmp;
+	self->cap = size;
+	if (self->size > size)
+		self->size = size;
 }

@@ -1,9 +1,9 @@
 TARGET=jlibtest
-CC=clang
-CFLAGS=-std=c11 -O2 -Iinclude/
+CC=gcc
+CFLAGS=-std=c89 -O2 -Iinclude/ -Wall
 
-OBJ_FILES=src/alloc.o src/arg.o src/array.o src/debug.o \
-		  src/map.o src/math.o src/stringify.o
+OBJ_FILES=src/arg.o src/array.o src/debug.o \
+		  src/math.o src/stringify.o
 
 .PHONY: clean
 
