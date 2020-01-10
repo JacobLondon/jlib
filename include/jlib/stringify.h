@@ -9,7 +9,7 @@
 
 // cpython's pymacro.h
 #define _STRINGIFY(x) #x
-#define STRINGIFY(x) _XSTRINGIFY(x)
+#define STRINGIFY(x) _STRINGIFY(x)
 
 /**
  * Strings to a given type
@@ -44,6 +44,7 @@
 #define jlib_string_new(Size) calloc(Size, sizeof(char))
 char *jlib_string_from(const char *literal);
 int jlib_string_fast_eq(const char *str0, const char *str1);
+void jlib_string_concat(char *target, void *src, size_t size);
 
 char *jlib_string_fread(const char *fname);
 void jlib_string_fwrite(const char *fname, const char *cstr);
@@ -58,7 +59,6 @@ void jlib_string_fappend(const char *fname, const char *cstr);
 #ifndef JLIB_STRING_SEP
 # define JLIB_STRING_SEP " "
 #endif
-void jlib_string_concat(char *target, void *src, size_t size);
 
 #define JLIB_STRING_LOOKUP_PROTO(Type, Spec) \
     void _jlib_build_##Spec(char *string, Type value)
