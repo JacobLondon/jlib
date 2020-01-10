@@ -9,7 +9,7 @@
 
 // cpython's pymacro.h
 #define _STRINGIFY(x) #x
-#define STRINGIFY(x) _XSTRINGIFY(x)
+#define STRINGIFY(x) _STRINGIFY(x)
 
 /**
  * Strings to a given type
