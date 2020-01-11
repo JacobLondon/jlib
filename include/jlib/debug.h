@@ -13,6 +13,7 @@ extern int _InternalHerePass;
 
 void halt(const char *message);
 
+
 /* cpython's pymacro.h
    Assert a build-time dependency, as an expression.
    Your compile will fail if the condition isn't true, or can't be evaluated
@@ -20,11 +21,15 @@ void halt(const char *message);
 
    Written by Rusty Russell, public domain, http://ccodearchive.net/ */
 
-#define BUILD_ASSERT_EXPR(cond) \
-	(sizeof(char [1 - 2*!(cond)]) - 1)
+#ifdef NDEBUG
+	#define assert_static(cond) ((void)0)
+#else
+	#define assert_static_expr(cond) \
+		(sizeof(char [1 - 2*!(cond)]) - 1)
 
-#define BUILD_ASSERT(cond) do { \
-		(void)BUILD_ASSERT_EXPR(cond); \
-	} while(0)
+	#define assert_static(cond) do { \
+			(void)assert_static_expr(cond); \
+		} while(0)
+#endif /* NDEBUG */
 
 #endif /* JLIB_DEBUG_H */
