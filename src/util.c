@@ -19,7 +19,8 @@ void swap(void *x, void *y)
 
 void clear(void *buf, int bytes)
 {
-	for (int i = 0; i < bytes; i++)
+    int i;
+	for (i = 0; i < bytes; i++)
 		((char *)buf)[i] = 0;
 }
 
@@ -30,7 +31,8 @@ void *copy(void *buf, size_t size)
 		fputs("Error: Failed to malloc in copy", stderr);
 		exit(-1);
 	}
-	for (size_t i = 0; i < size; i++)
+	size_t i;
+	for (i = 0; i < size; i++)
 		new[i] = ((char *)buf)[i];
 	return (void *)new;
 }
