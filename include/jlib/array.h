@@ -1,7 +1,7 @@
 #ifndef JLIB_ARRAY_H
 #define JLIB_ARRAY_H
 
-#include <stdlib.h> /* size_t */
+#include <stddef.h> /* size_t */
 
 #include "generic.h"
 

@@ -6,7 +6,6 @@
 struct array_s *array_new(void (* f_free)(void *buf))
 {
 	struct array_s *self = malloc(sizeof(struct array_s));
-
 	if (!self) {
 		fputs("Error: Could not malloc for array init", stderr);
 		exit(-1);

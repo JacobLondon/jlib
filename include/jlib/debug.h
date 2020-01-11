@@ -3,12 +3,12 @@
 
 #include <stdio.h>
 
-extern int HerePass;
-#define HERE_OFF HerePass = 0
-#define HERE_ON HerePass = 1
+extern int _InternalHerePass;
+#define HERE_OFF _InternalHerePass = 0
+#define HERE_ON _InternalHerePas = 1
 
 #define HERE(num) \
-	if (HerePass) \
+	if (_InternalHerePass) \
 		fprintf(stderr, "%s:%s:%d: Here %d\n", __FILE__, __func__, __LINE__, num)
 
 void halt(const char *message);
