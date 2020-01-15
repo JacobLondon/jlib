@@ -7,15 +7,15 @@
 
 #define println(Fmt, ...) do { \
 	printf(Fmt, __VA_ARGS__); \
-	printf("\n"); \
+	puts(""); \
 } while (0)
 
-#define newline() printf("\n")
+#define newline() puts("")
 
 #define fprint(File, Fmt, ...) fprintf(File, Fmt, __VA_ARGS__)
 #define fprintln(File, Fmt, ...) do { \
 	printf(File, Fmt, __VA_ARGS__); \
-	printf("\n"); \
+	fputs("", File); \
 } while (0)
 
 #endif /* JLIB_PRINT_H */

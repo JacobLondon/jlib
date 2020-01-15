@@ -58,6 +58,11 @@ void array_pop(struct array_s *self)
 {
 	if (self->size > 0)
 		self->size--;
+
+	if (self->free && self->buf[self->size])
+		self->free(self->buf[self->size]);
+
+	self->buf[self->size] = NULL;
 }
 
 void array_resize(struct array_s *self, size_t size)

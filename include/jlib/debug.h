@@ -5,7 +5,7 @@
 
 extern int _InternalHerePass;
 #define HERE_OFF _InternalHerePass = 0
-#define HERE_ON _InternalHerePas = 1
+#define HERE_ON _InternalHerePass = 1
 
 #define HERE(num) \
 	if (_InternalHerePass) \

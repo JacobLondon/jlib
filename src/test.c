@@ -1,16 +1,7 @@
 #include <string.h>
 #include <jlib/jlib.h>
 
-static void array_test()
-{
-	struct array_s *a = array_new(NULL);
-	int b = 10;
-	array_push(a, b);
-	println("%d", array_read(a, 0, int));
-	array_free(a);
-}
-
-static void arg_test()
+static void test_arg()
 {
 	int argc = 4;
 	char *argv[4] = {
@@ -40,7 +31,38 @@ static void arg_test()
 	println("%d\t%d\t%d", defs.count_num, defs.c, defs.v);
 }
 
-static void stringify_test()
+static void test_array()
+{
+	struct array_s *a = array_new(NULL);
+	int b = 10;
+	int c = 11;
+	int d = 12;
+	array_push(a, b);
+	array_push(a, c);
+	array_push(a, d);
+	println("%d", array_read(a, 0, int));
+	println("%d", array_read(a, 1, int));
+	println("%d", array_read(a, 2, int));
+	array_write(a, 2, b);
+	println("%d", array_read(a, 2, int));
+	array_pop(a);
+	println("%d", array_read(a, 2, int));
+	array_free(a);
+}
+
+static void test_debug()
+{
+	HERE(1);
+	HERE_OFF;
+	HERE(2);
+	HERE_ON;
+	HERE(3);
+
+	assert_static(10 == 10);
+	halt("Static assert successful");
+}
+
+static void test_stringify()
 {
 	char *test = calloc(1000, 1);
 
@@ -57,12 +79,14 @@ static void stringify_test()
 
 int main(int argc, char **argv)
 {
-	if (arg_check(argc, argv, "--array"))
-		array_test();
-	else if (arg_check(argc, argv, "--arg"))
-		arg_test();
+	if (arg_check(argc, argv, "--arg"))
+		test_arg();
+	else if (arg_check(argc, argv, "--array"))
+		test_array();
+	else if (arg_check(argc, argv, "--debug"))
+		test_debug();
 	else if (arg_check(argc, argv, "--string"))
-		stringify_test();
+		test_stringify();
 	else {
 		puts("Usage:\n--array\n--arg\n--string");
 	}

@@ -19,7 +19,7 @@ void swap(void *x, void *y)
 
 void clear(void *buf, int bytes)
 {
-    int i;
+	int i;
 	for (i = 0; i < bytes; i++)
 		((char *)buf)[i] = 0;
 }
