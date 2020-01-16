@@ -1,5 +1,5 @@
-#ifndef JLIB_STRINGIFY_H
-#define JLIB_STRINGIFY_H
+#ifndef JLIB_STR_H
+#define JLIB_STR_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,4 +37,4 @@ STRCAT_LOOKUP_PROTO(unsigned long long int, llu);
 STRCAT_LOOKUP_PROTO(float, f);
 STRCAT_LOOKUP_PROTO(double, lf);
 
-#endif /* JLIB_STRINGIFY_H */
+#endif /* JLIB_STR_H */

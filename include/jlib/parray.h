@@ -21,7 +21,8 @@ void parray_pop(struct parray *self);
 void parray_resize(struct parray *self, size_t size);
 
 #define parray_push(Arrayptr, Valueptr) parray_push_((Arrayptr), ((void*)&(Valueptr)))
-#define parray_read(Arrayptr, Index, Type) (val((Arrayptr)->buf[(Index)], Type))
+#define parray_read(Arrayptr, Index, Type) (*(Type *)((Arrayptr)->buf[(Index)]))
+
 #define parray_write(Arrayptr, Index, Valueptr) (Arrayptr)->buf[(Index)] = ((void*)&(Valueptr))
 
 #endif /* JLIB_ARRAY_H */

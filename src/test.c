@@ -1,4 +1,3 @@
-#include <string.h>
 #include <jlib/jlib.h>
 
 static void test_arg()
@@ -31,23 +30,23 @@ static void test_arg()
 	println("%d\t%d\t%d", defs.count_num, defs.c, defs.v);
 }
 
-static void test_array()
+static void test_parray()
 {
-	struct array_s *a = array_new(NULL);
+	struct parray *a = parray_new(NULL);
 	int b = 10;
 	int c = 11;
 	int d = 12;
-	array_push(a, b);
-	array_push(a, c);
-	array_push(a, d);
-	println("%d", array_read(a, 0, int));
-	println("%d", array_read(a, 1, int));
-	println("%d", array_read(a, 2, int));
-	array_write(a, 2, b);
-	println("%d", array_read(a, 2, int));
-	array_pop(a);
-	println("%d", array_read(a, 2, int));
-	array_free(a);
+	parray_push(a, b);
+	parray_push(a, c);
+	parray_push(a, d);
+	println("%d", parray_read(a, 0, int));
+	println("%d", parray_read(a, 1, int));
+	println("%d", parray_read(a, 2, int));
+	parray_write(a, 2, b);
+	println("%d", parray_read(a, 2, int));
+	parray_pop(a);
+	println("%d", parray_read(a, 2, int));
+	parray_free(a);
 }
 
 static void test_debug()
@@ -81,14 +80,14 @@ int main(int argc, char **argv)
 {
 	if (arg_check(argc, argv, "--arg"))
 		test_arg();
-	else if (arg_check(argc, argv, "--array"))
+	else if (arg_check(argc, argv, "--parray"))
 		test_array();
 	else if (arg_check(argc, argv, "--debug"))
 		test_debug();
 	else if (arg_check(argc, argv, "--string"))
 		test_stringify();
 	else {
-		puts("Usage:\n--array\n--arg\n--string");
+		puts("Usage:\n--parray\n--arg\n--string");
 	}
 
 	return 0;

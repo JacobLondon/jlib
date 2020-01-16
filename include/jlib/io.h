@@ -1,5 +1,5 @@
-#ifndef JLIB_PRINT_H
-#define JLIB_PRINT_H
+#ifndef JLIB_IO_H
+#define JLIB_IO_H
 
 #include <stdio.h>
 
@@ -13,4 +13,4 @@ char *file_read(const char *fname);
 void file_write(const char *fname, const char *cstr);
 void file_append(const char *fname, const char *cstr);
 
-#endif /* JLIB_PRINT_H */
+#endif /* JLIB_IO_H */
