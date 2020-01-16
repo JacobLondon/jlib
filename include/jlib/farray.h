@@ -9,8 +9,8 @@
 /* flat array */
 struct farray {
 	void *buf;
-	size_t size; /* read-only */
-	size_t cap;  /* read-only */
+	size_t size;  /* read-only */
+	size_t cap;   /* read-only */
 	size_t isize; /* read-only, size of a single item */
 };
 

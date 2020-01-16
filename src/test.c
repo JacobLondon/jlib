@@ -85,6 +85,40 @@ static void test_parray()
 	parray_free(a);
 }
 
+static void test_fmap()
+{
+	struct fmap *m = fmap_new(sizeof(int));
+
+	fmap_write(m, "a", 10, int);
+	fmap_write(m, "b", 11, int);
+	fmap_write(m, "c", 12, int);
+	println("%d", fmap_read(m, "a", int));
+	println("%d", fmap_read(m, "b", int));
+	println("%d", fmap_read(m, "c", int));
+	/* will print 0, as it's empty */
+	println("%d", fmap_read(m, "d", int));
+
+	println("'a' in map? %d", fmap_check(m, "a"));
+	println("'d' in map? %d", fmap_check(m, "d"));
+
+	fmap_write(m, "c", 12, int);
+	fmap_write(m, "d", 12, int);
+	fmap_write(m, "e", 12, int);
+	fmap_write(m, "f", 12, int);
+	fmap_write(m, "g", 12, int);
+	fmap_write(m, "h", 12, int);
+	fmap_write(m, "i", 12, int);
+	fmap_write(m, "j", 12, int);
+
+	println("old cap: %ld", m->cap);
+	fmap_grow(m, 100);
+	println("new cap: %ld", m->cap);
+	println("'a' still in map? %d", fmap_check(m, "a"));
+
+	newline();
+	
+}
+
 static void test_str()
 {
 	char *test = calloc(1000, 1);
@@ -124,12 +158,14 @@ int main(int argc, char **argv)
 		test_farray();
 	else if (arg_check(argc, argv, "--parray"))
 		test_parray();
+	else if (arg_check(argc, argv, "--fmap"))
+		test_fmap();
 	else if (arg_check(argc, argv, "--str"))
 		test_str();
 	else if (arg_check(argc, argv, "--timer"))
 		test_timer();
 	else {
-		puts("Usage:\n--arg\n--debug\n--farray\n--parray\n--str\n--timer");
+		puts("Usage:\n--arg\n--debug\n--farray\n--parray\n--fmap\n--str\n--timer");
 	}
 
 	return 0;

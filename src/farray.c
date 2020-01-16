@@ -32,9 +32,8 @@ void farray_free(struct farray *self)
 	/* clear each byte and free buffer */
 	if (self->buf) {
 		size_t i;
-		for (i = 0; i < self->size * self->isize; i++) {
+		for (i = 0; i < self->size * self->isize; i++)
 			((char *)self->buf)[i] = 0;
-		}
 		free(self->buf);
 	}
 

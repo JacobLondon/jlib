@@ -4,6 +4,7 @@
 #include "arg.h"
 #include "debug.h"
 #include "farray.h"
+#include "fmap.h"
 #include "generic.h"
 #include "io.h"
 #include "math.h"
