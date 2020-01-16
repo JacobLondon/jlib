@@ -1,6 +1,6 @@
 #include <jlib/timer.h>
 
-clock_t _InternalTimerStar = 0;
+clock_t _InternalTimerStart = 0;
 
 void timer_rst()
 {

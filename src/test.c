@@ -102,7 +102,16 @@ static void test_str()
 
 static void test_timer()
 {
+	unsigned long i;
+	double dur;
 
+	timer_rst();
+	for (i = 0; i < 50000UL; i++)
+		print("%lu\r", i);
+	dur = timer_lap();
+	
+	newline();
+	println("Duration: %lf", dur);
 }
 
 int main(int argc, char **argv)
