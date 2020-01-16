@@ -8,7 +8,7 @@ float fast_sqrtf(float number)
 
 	union {
 		float f;
-		uint32_t i;
+		int i; /* assume sizeof(float) == sizeof(int) */
 	} conv = { number }; /* member 'f' set to value of 'number'. */
 	conv.i = 0x5f3759df - (conv.i >> 1);
 	conv.f *= (threehalfs - (x2 * conv.f * conv.f ));
@@ -22,7 +22,7 @@ float fast_invsqrtf(float number)
 
 	union {
 		float f;
-		uint32_t i;
+		int i; /* assume sizeof(float) == sizeof(int) */
 	} conv = { number }; /* member 'f' set to value of 'number'. */
 	conv.i = 0x5f3759df - (conv.i >> 1);
 	conv.f *= (threehalfs - (x2 * conv.f * conv.f ));

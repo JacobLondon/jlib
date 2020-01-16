@@ -15,10 +15,10 @@ struct farray {
 };
 
 /* allocate an array on the heap, pass a function to free each item on array_free, NULL if not needed */
-struct farray *farray_new(size_t isize, void (* free_fn)(void *buf));
-void farray_free(struct parray *self);
-void farray_pop(struct parray *self);
-void farray_resize(struct parray *self, size_t cap);
+struct farray *farray_new(size_t isize);
+void farray_free(struct farray *self);
+void farray_pop(struct farray *self);
+void farray_resize(struct farray *self, size_t cap);
 
 #define farray_push(Arrayptr, Value, Type) \
 	do { \

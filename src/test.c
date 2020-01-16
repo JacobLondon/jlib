@@ -81,7 +81,7 @@ int main(int argc, char **argv)
 	if (arg_check(argc, argv, "--arg"))
 		test_arg();
 	else if (arg_check(argc, argv, "--parray"))
-		test_array();
+		test_parray();
 	else if (arg_check(argc, argv, "--debug"))
 		test_debug();
 	else if (arg_check(argc, argv, "--string"))

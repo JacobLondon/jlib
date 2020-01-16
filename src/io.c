@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include <jlib/io.h>
 
 char *file_read(const char *fname)
@@ -12,7 +14,7 @@ char *file_read(const char *fname)
 		fseek(f, 0, SEEK_SET);
 		buf = malloc(length);
 		if (buf) {
-			fread(buf, 1, length, f);
+			(void)fread(buf, 1, length, f);
 		}
 		fclose(f);
 	}

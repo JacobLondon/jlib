@@ -6,6 +6,9 @@
 #include <string.h>
 
 int streq(const char *str0, const char *str1);
+#ifndef strdup
+char *strdup(const char *cstr);
+#endif /* strdup */
 
 #define _STRINGIFY(x) #x
 #define STRINGIFY(x) _STRINGIFY(x)

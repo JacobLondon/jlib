@@ -1,4 +1,4 @@
-#include <jlib/stringify.h>
+#include <jlib/str.h>
 
 int streq(const char *cstr0, const char *cstr1)
 {
@@ -9,6 +9,22 @@ int streq(const char *cstr0, const char *cstr1)
 	}
 	return 1;
 }
+
+#ifndef strdup
+char *strdup(const char *cstr)
+{
+	char *build = calloc(strlen(cstr) + 1, sizeof(char));
+	if (!build) {
+		fputs("Error: Could not calloc in strnew\n", stderr);
+		exit(-1);
+	}
+	size_t i;
+	for (i = 0; (build[i] = cstr[i]); i++)
+		;
+	
+	return build;
+}
+#endif /* strdup */
 
 STRCAT_LOOKUP(char, c)
 STRCAT_LOOKUP(int, d)
