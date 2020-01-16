@@ -30,6 +30,39 @@ static void test_arg()
 	println("%d\t%d\t%d", defs.count_num, defs.c, defs.v);
 }
 
+static void test_debug()
+{
+	HERE(1);
+	HERE_OFF;
+	HERE(2);
+	HERE_ON;
+	HERE(3);
+
+	assert_static(10 == 10);
+	halt("Static assert successful");
+}
+
+static void test_farray()
+{
+	struct farray *a = farray_new(sizeof(int));
+	farray_push(a, 10, int);
+	farray_push(a, 11, int);
+	farray_push(a, 12, int);
+
+	println("%d", farray_read(a, 0, int));
+	println("%d", farray_read(a, 1, int));
+	println("%d", farray_read(a, 2, int));
+
+	farray_write(a, 2, 10, int);
+	println("%d", farray_read(a, 2, int));
+	farray_pop(a);
+	/* will clear the last item with zeros */
+	println("%d", farray_read(a, 2, int));
+	farray_resize(a, 50);
+
+	farray_free(a);
+}
+
 static void test_parray()
 {
 	struct parray *a = parray_new(NULL);
@@ -45,23 +78,14 @@ static void test_parray()
 	parray_write(a, 2, b);
 	println("%d", parray_read(a, 2, int));
 	parray_pop(a);
-	println("%d", parray_read(a, 2, int));
+	/* will segfault, index 2 was just NULL'ed */
+	/* println("%d", parray_read(a, 2, int)); */
+	println("%d", parray_read(a, 1, int));
+	parray_resize(a, 50);
 	parray_free(a);
 }
 
-static void test_debug()
-{
-	HERE(1);
-	HERE_OFF;
-	HERE(2);
-	HERE_ON;
-	HERE(3);
-
-	assert_static(10 == 10);
-	halt("Static assert successful");
-}
-
-static void test_stringify()
+static void test_str()
 {
 	char *test = calloc(1000, 1);
 
@@ -76,18 +100,27 @@ static void test_stringify()
 	print("literal = %s\n", lit);
 }
 
+static void test_timer()
+{
+
+}
+
 int main(int argc, char **argv)
 {
 	if (arg_check(argc, argv, "--arg"))
 		test_arg();
-	else if (arg_check(argc, argv, "--parray"))
-		test_parray();
 	else if (arg_check(argc, argv, "--debug"))
 		test_debug();
-	else if (arg_check(argc, argv, "--string"))
-		test_stringify();
+	else if (arg_check(argc, argv, "--farray"))
+		test_farray();
+	else if (arg_check(argc, argv, "--parray"))
+		test_parray();
+	else if (arg_check(argc, argv, "--str"))
+		test_str();
+	else if (arg_check(argc, argv, "--timer"))
+		test_timer();
 	else {
-		puts("Usage:\n--parray\n--arg\n--string");
+		puts("Usage:\n--arg\n--debug\n--farray\n--parray\n--str\n--timer");
 	}
 
 	return 0;

@@ -49,7 +49,7 @@ void farray_pop(struct farray *self)
 	/* clear the bytes of the popped item */
 	size_t i;
 	for (i = 0; i < self->isize; i++)
-		((char *)self->buf)[i] = 0;
+		((char *)self->buf)[self->size * self->isize + i] = 0;
 }
 
 void farray_resize(struct farray *self, size_t cap)

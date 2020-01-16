@@ -31,7 +31,7 @@ void farray_resize(struct farray *self, size_t cap);
 
 #define farray_read(Arrayptr, Index, Type) (((Type *)((Arrayptr)->buf))[(Index)])
 
-#define farray_write(Arrayptr, Index, Type, Value) \
+#define farray_write(Arrayptr, Index, Value, Type) \
 	do { \
 		((Type *)((Arrayptr)->buf))[(Index)] = (Value); \
 	} while (0)
