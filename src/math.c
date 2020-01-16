@@ -38,9 +38,9 @@ float fast_invsqrtf(float number)
  *
  * Computes: pow(base, exp), i.e. @base raised to the @exp power
  */
-uint64_t int_pow(uint64_t base, unsigned int exp)
+unsigned long long int_pow(unsigned long long base, unsigned int exp)
 {
-	uint64_t result = 1;
+	unsigned long long result = 1;
 
 	while (exp) {
 		if (exp & 1)

@@ -3,9 +3,9 @@
 
 #include <jlib/array.h>
 
-struct array_s *array_new(void (* f_free)(void *buf))
+struct parray *parray_new(void (* free_fn)(void *buf))
 {
-	struct array_s *self = malloc(sizeof(struct array_s));
+	struct parray *self = malloc(sizeof(struct parray));
 	if (!self) {
 		fputs("Error: Could not malloc for array init", stderr);
 		exit(-1);
@@ -19,12 +19,12 @@ struct array_s *array_new(void (* f_free)(void *buf))
 
 	self->size = 0;
 	self->cap  = ARRAY_DEFAULT_CAP;
-	self->free = f_free;
+	self->free = free_fn;
 
 	return self;
 }
 
-void array_free(struct array_s *self)
+void parray_free(struct parray *self)
 {
 	if (!self)
 		return;
@@ -43,7 +43,7 @@ Skip:
 	free(self);
 }
 
-void array_push_(struct array_s *self, void *value)
+void parray_push_(struct parray *self, void *value)
 {
 	/* realloc for more space */
 	if (self->size == self->cap) {
@@ -54,7 +54,7 @@ void array_push_(struct array_s *self, void *value)
 	*(self->buf + self->size++) = value;
 }
 
-void array_pop(struct array_s *self)
+void parray_pop(struct parray *self)
 {
 	if (self->size > 0)
 		self->size--;
@@ -65,7 +65,7 @@ void array_pop(struct array_s *self)
 	self->buf[self->size] = NULL;
 }
 
-void array_resize(struct array_s *self, size_t size)
+void parray_resize(struct parray *self, size_t size)
 {
 	void **tmp = realloc(self->buf, size);
 	if (!tmp) {

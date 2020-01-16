@@ -5,12 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *strnew(const char *literal);
 int streq(const char *str0, const char *str1);
-
-char *file_read(const char *fname);
-void file_write(const char *fname, const char *cstr);
-void file_append(const char *fname, const char *cstr);
 
 #define _STRINGIFY(x) #x
 #define STRINGIFY(x) _STRINGIFY(x)
@@ -19,27 +14,27 @@ void file_append(const char *fname, const char *cstr);
  * Builder strings
  */
 
-#define CONCAT_MAX 128U /* number value unlikely to have more digits */
+#define STRCAT_MAX 128U /* number value unlikely to have more digits */
 
-#define CONCAT_LOOKUP_PROTO(Type, Spec) \
-	void concat_##Spec(char *string, Type value)
+#define STRCAT_LOOKUP_PROTO(Type, Spec) \
+	void strcat_##Spec(char *string, Type value)
 
-#define CONCAT_LOOKUP(Type, Spec) \
-void concat_##Spec(char *dest, Type value) \
+#define STRCAT_LOOKUP(Type, Spec) \
+void strcat_##Spec(char *dest, Type value) \
 { \
-	char tmp[CONCAT_MAX] = {0}; \
+	char tmp[STRCAT_MAX] = {0}; \
 	sprintf(tmp, "%" #Spec " ", value); \
 	strncat(dest, tmp, strlen(tmp)); \
 }
 
-CONCAT_LOOKUP_PROTO(char, c);
-CONCAT_LOOKUP_PROTO(int, d);
-CONCAT_LOOKUP_PROTO(unsigned int, u);
-CONCAT_LOOKUP_PROTO(long int, ld);
-CONCAT_LOOKUP_PROTO(unsigned long int, lu);
-CONCAT_LOOKUP_PROTO(long long int, lld);
-CONCAT_LOOKUP_PROTO(unsigned long long int, llu);
-CONCAT_LOOKUP_PROTO(float, f);
-CONCAT_LOOKUP_PROTO(double, lf);
+STRCAT_LOOKUP_PROTO(char, c);
+STRCAT_LOOKUP_PROTO(int, d);
+STRCAT_LOOKUP_PROTO(unsigned int, u);
+STRCAT_LOOKUP_PROTO(long int, ld);
+STRCAT_LOOKUP_PROTO(unsigned long int, lu);
+STRCAT_LOOKUP_PROTO(long long int, lld);
+STRCAT_LOOKUP_PROTO(unsigned long long int, llu);
+STRCAT_LOOKUP_PROTO(float, f);
+STRCAT_LOOKUP_PROTO(double, lf);
 
 #endif /* JLIB_STRINGIFY_H */

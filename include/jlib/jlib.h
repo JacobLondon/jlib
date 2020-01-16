@@ -5,8 +5,8 @@
 #include "array.h"
 #include "debug.h"
 #include "generic.h"
+#include "io.h"
 #include "math.h"
-#include "print.h"
 #include "stringify.h"
 
 #endif /* JLIB_JLIB_H */

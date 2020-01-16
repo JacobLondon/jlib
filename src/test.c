@@ -70,10 +70,10 @@ static void test_stringify()
 	strcat(test, "ok");
 	strcat(test, "ok");
 	strcat(test, "wow");
-	concat_lld(test, 100L);
+	strcat_lld(test, 100LL);
 	println("test = %s", test);
 
-	char *lit = strnew("1234567890");
+	char *lit = strdup("1234567890");
 	print("literal = %s\n", lit);
 }
 
