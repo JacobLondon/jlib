@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <jlib/array.h>
+#include <jlib/parray.h>
 
 struct parray *parray_new(void (* free_fn)(void *buf))
 {
@@ -11,14 +11,14 @@ struct parray *parray_new(void (* free_fn)(void *buf))
 		exit(-1);
 	}
 
-	self->buf = malloc(sizeof(void *) * ARRAY_DEFAULT_CAP);
+	self->buf = malloc(sizeof(void *) * PARRAY_DEFAULT_CAP);
 	if (!self->buf) {
-		fputs("Error: Could not malloc array buffer", stderr);
+		fputs("Error: Could not malloc parray buffer", stderr);
 		exit(-1);
 	}
 
 	self->size = 0;
-	self->cap  = ARRAY_DEFAULT_CAP;
+	self->cap  = PARRAY_DEFAULT_CAP;
 	self->free = free_fn;
 
 	return self;
@@ -29,17 +29,17 @@ void parray_free(struct parray *self)
 	if (!self)
 		return;
 
-	if (!(self->buf && self->free))
-		goto Skip;
-
-	size_t i;
-	for (i = 0; i < self->size; i++) {
-		if (*(self->buf + i)) {
-			self->free(*(self->buf + i));
+	/* clear and free buffer */
+	if (self->buf) {
+		size_t i;
+		for (i = 0; i < self->size; i++) {
+			if (*(self->buf + i) && self->free)
+				self->free(*(self->buf + i));
+			*(self->buf + i) = NULL;
 		}
+		free(self->buf);
 	}
 
-Skip:
 	free(self);
 }
 
@@ -47,8 +47,8 @@ void parray_push_(struct parray *self, void *value)
 {
 	/* realloc for more space */
 	if (self->size == self->cap) {
-		self->cap = self->cap * ARRAY_DEFAULT_SCALING;
-		array_resize(self, self->cap);
+		self->cap = self->cap * PARRAY_DEFAULT_SCALING;
+		parray_resize(self, self->cap);
 	}
 
 	*(self->buf + self->size++) = value;
@@ -65,16 +65,16 @@ void parray_pop(struct parray *self)
 	self->buf[self->size] = NULL;
 }
 
-void parray_resize(struct parray *self, size_t size)
+void parray_resize(struct parray *self, size_t cap)
 {
-	void **tmp = realloc(self->buf, size);
+	void **tmp = realloc(self->buf, cap);
 	if (!tmp) {
-		fputs("Error: Could not realloc array buffer", stderr);
+		fputs("Error: Could not realloc parray buffer", stderr);
 		exit(-1);
 	}
 
 	self->buf = tmp;
-	self->cap = size;
-	if (self->size > size)
-		self->size = size;
+	self->cap = cap;
+	if (self->size > cap)
+		self->size = cap;
 }
