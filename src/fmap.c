@@ -11,7 +11,7 @@ size_t hash_fnv1a(const char *cstr, size_t bias, size_t max)
 	return hash % max;
 }
 
-struct fmap *fmap_new(size_t isize)
+struct fmap *fmap_new_rsrv(size_t isize, size_t cap)
 {
 	struct fmap *self = malloc(sizeof(struct fmap));
 	if (!self) {
@@ -19,8 +19,8 @@ struct fmap *fmap_new(size_t isize)
 		exit(-1);
 	}
 
-	self->vals = calloc(FMAP_DEFAULT_CAP, isize);
-	self->keys = calloc(FMAP_DEFAULT_CAP, sizeof(char *));
+	self->vals = calloc(cap, isize);
+	self->keys = calloc(cap, sizeof(char *));
 	self->cap = FMAP_DEFAULT_CAP;
 	self->isize = isize;
 
@@ -43,9 +43,10 @@ void fmap_free(struct fmap *self)
 	if (self->keys) {
 		size_t i;
 		for (i = 0; i < self->cap; i++) {
-			if (self->keys[i])
+			if (self->keys[i]) {
 				free(self->keys[i]);
-			self->keys[i] = NULL;
+				self->keys[i] = NULL;
+			}
 		}
 		free(self->keys);
 	}
@@ -53,7 +54,6 @@ void fmap_free(struct fmap *self)
 	free(self);
 }
 
-/* return first unused index found */
 size_t fmap_biased_index(struct fmap* self, const char *key)
 {
 	size_t index;
@@ -72,42 +72,47 @@ int fmap_check(struct fmap *self, const char *key)
 	return self->keys[index] ? 1 : 0;
 }
 
-void fmap_grow(struct fmap *self, size_t cap)
+void fmap_grow(struct fmap *self, int mod)
 {
-	if (self->cap > cap) {
-		fputs("Error: Tried to grow fmap to a smaller capacity", stderr);
+	if (mod < 1) {
+		fputs("Error: Tried to grow fmap by 0 or less", stderr);
 		exit(-1);
 	}
-	
+
 	/* swap data */
 	void  *oldvals = self->vals;
 	char **oldkeys = self->keys;
-	size_t oldcap  = self->cap;
-	self->vals = calloc(cap, self->isize);
+	const size_t oldcap = self->cap;
+	self->cap *= mod;
+
+	self->vals = calloc(self->cap, self->isize);
 	if (!self->vals) {
 		fputs("Error: Could not calloc values in fmap resize", stderr);
 		exit(-1);
 	}
-	self->keys = calloc(cap, sizeof(char *));
+	self->keys = calloc(self->cap, sizeof(char *));
 	if (!self->keys) {
 		fputs("Error: Could not calloc keys in fmap resize", stderr);
 		exit(-1);
 	}
-	self->cap  = cap;
 
 	size_t i, j, index;
 	for (i = 0; i < oldcap; i++) {
 		if (oldkeys[i]) {
 			index = fmap_biased_index(self, oldkeys[i]);
 			/* copy value bytes */
-			for (j = 0; j < self->isize; j++)
+			for (j = 0; j < self->isize; j++) {
 				((char *)self->vals)[index * self->isize + j] = ((char *)oldvals)[i * self->isize + j];
+				((char *)oldvals)[i * self->isize + j] = 0;
+			}
 			
 			/* move key */
 			self->keys[index] = oldkeys[i];
+			oldkeys[i] = NULL;
 		}
 	}
 	free(oldvals);
+	free(oldkeys);
 }
 
 void fmap_remove(struct fmap *self, const char *key)

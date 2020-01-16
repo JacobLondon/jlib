@@ -109,14 +109,22 @@ static void test_fmap()
 	fmap_write(m, "h", 12, int);
 	fmap_write(m, "i", 12, int);
 	fmap_write(m, "j", 12, int);
-
-	println("old cap: %ld", m->cap);
-	fmap_grow(m, 100);
+	
+	newline();
+	println("Resizing...\nold cap: %ld", m->cap);
+	fmap_grow_to(m, 100);
 	println("new cap: %ld", m->cap);
 	println("'a' still in map? %d", fmap_check(m, "a"));
+	puts("Removing A...");
+	fmap_remove(m, "a");
+	println("'a' still in map? %d", fmap_check(m, "a"));
 
-	newline();
-	
+	puts("Removing 'z' (not in)");
+	fmap_remove(m, "z");
+
+	puts("Freeing...");
+	fmap_free(m);
+	puts("Success!");
 }
 
 static void test_str()
