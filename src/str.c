@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include <jlib/str.h>
 
 int streq(const char *cstr0, const char *cstr1)

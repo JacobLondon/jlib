@@ -1,7 +1,6 @@
 #ifndef JLIB_STR_H
 #define JLIB_STR_H
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
