@@ -7,6 +7,8 @@ C Library with utility functions. Some functions from the CPython and Linux proj
 sudo apt install clang
 # GNU Make
 sudo apt install make
+# Python
+sudo apt-get install python3-dev
 ```
 
 # Building

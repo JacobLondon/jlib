@@ -9,6 +9,7 @@
 #include "io.h"
 #include "math.h"
 #include "parray.h"
+#include "plot.h"
 #include "str.h"
 #include "timer.h"
 #include "util.h"

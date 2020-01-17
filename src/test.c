@@ -127,6 +127,11 @@ static void test_fmap()
 	puts("Success!");
 }
 
+static void test_plot()
+{
+	plot_test();
+}
+
 static void test_str()
 {
 	char *test = calloc(1000, 1);
@@ -168,12 +173,14 @@ int main(int argc, char **argv)
 		test_parray();
 	else if (arg_check(argc, argv, "--fmap"))
 		test_fmap();
+	else if (arg_check(argc, argv, "--plot"))
+		test_plot();
 	else if (arg_check(argc, argv, "--str"))
 		test_str();
 	else if (arg_check(argc, argv, "--timer"))
 		test_timer();
 	else {
-		puts("Usage:\n--arg\n--debug\n--farray\n--parray\n--fmap\n--str\n--timer");
+		puts("Usage:\n--arg\n--debug\n--farray\n--parray\n--plot\n--fmap\n--str\n--timer");
 	}
 
 	return 0;
