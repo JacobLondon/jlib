@@ -129,7 +129,10 @@ static void test_fmap()
 
 static void test_plot()
 {
-	plot_test();
+	/*plot_test(); */
+	int a[5] = {0, 1, 2, 3, 4};
+	char *b = plot_fmt_i(a, 5);
+	println("%s", b);
 }
 
 static void test_str()

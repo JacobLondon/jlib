@@ -4,3 +4,4 @@ a.out
 jlibtest
 *.o
 *.a
+test.py

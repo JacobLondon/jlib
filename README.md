@@ -9,6 +9,7 @@ sudo apt install clang
 sudo apt install make
 # Python
 sudo apt-get install python3-dev
+pip3 install matplotlib
 ```
 
 # Building
