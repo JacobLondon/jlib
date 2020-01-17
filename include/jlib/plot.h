@@ -6,30 +6,58 @@
 
 #include <stddef.h> /* size_t */
 
-extern char *_InternalPlotProgram;
 #define PLOT_MAX_NUMBER_LENGTH 20
+#define PLOT_DEFAULT_PROG_SIZE 256
+#define PLOT_DEFAULT_ARG_SIZE 128
 
-#define plot_init Py_Initialize();
-#define plot_exit Py_Finalize();
+enum plot_types {
+	PLOT_SIMPLE,
+	PLOT_SUBPLOT,
+	PLOT_INT,
+	PLOT_FLOAT,
+	PLOT_DOUBLE
+};
 
+struct subplot {
+	size_t x, y;
+	char *args;  /* x-axis, y-axis, options, ... repeat */
+	char *title;
+	size_t argc;
+};
+
+struct plot {
+	char *program;
+	struct subplot **subplots;
+	unsigned w, h;
+	unsigned type;
+};
+
+struct plot *plot_new(unsigned w, unsigned h, int type);
+void plot_free(struct plot *self);
+void plot_sub_new(struct plot *self, size_t x, size_t y, char *title);
+void plot_sub_insert(struct plot *self, size_t x, size_t y,
+	void *axis_x, void *axis_y, char *options, unsigned type, size_t count);
+void plot_show(struct plot *self);
+
+#if 0
 void _plot_test();
 
-void plot_simple();
-char *arri_to_s(int *arr);
-char *arrf_to_s(double *arr);
+void plot_init();
+void plot_exit();
+#endif
 
-/* format an array to a Python list, [X,X,X,...] 
+/* format an array to a Python list, [X,X,X,...]
    pass a function which puts a single item into a string,
    where the string's length is PLOT_MAX_NUMBER_LENGTH or less */
-char *plot_fmt_array(void *arr, size_t count,
-	void (* stringify)(char *target, void *data, size_t index));
-void plot_stringify_int(char *target, void *data, size_t index);
-void plot_stringify_float(char *target, void *data, size_t index);
-void plot_stringify_double(char *target, void *data, size_t index);
+char *plot_atoa(void *arr, size_t count,
+	void (* _toa)(char *target, void *data, size_t index));
+void _plot_itoa(char *target, void *data, size_t index);
+void _plot_ftoa(char *target, void *data, size_t index);
+void _plot_dtoa(char *target, void *data, size_t index);
 
-#define plot_fmt_i(Arr, Count) plot_fmt_array(Arr, Count, plot_stringify_int)
-#define plot_fmt_f(Arr, Count) plot_fmt_array(Arr, Count, plot_stringify_float)
-#define plot_fmt_lf(Arr, Count) plot_fmt_array(Arr, Count, plot_stringify_double)
+#define plot_itoa(Arr, Count) plot_atoa(Arr, Count, _plot_itoa)
+#define plot_ftoa(Arr, Count) plot_atoa(Arr, Count, _plot_ftoa)
+#define plot_dtoa(Arr, Count) plot_atoa(Arr, Count, _plot_dtoa)
 
 
 #endif /* JLIB_PLOT_H */

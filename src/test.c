@@ -130,9 +130,17 @@ static void test_fmap()
 static void test_plot()
 {
 	/*plot_test(); */
-	int a[5] = {0, 1, 2, 3, 4};
-	char *b = plot_fmt_i(a, 5);
+	int x[5] = {0, 1, 2, 3, 4};
+	char *b = plot_itoa(x, 5);
 	println("%s", b);
+
+	int y[5] = {15, 16, 17, 18, 19};
+
+	struct plot *p = plot_new(0, 0, PLOT_SUBPLOT);
+	plot_sub_new(p, 0, 0, "A vs B vs C");
+	plot_sub_insert(p, 0, 0, x, y, "-g", PLOT_INT, 5);
+	plot_sub_insert(p, 0, 0, y, x, "-o", PLOT_INT, 5);
+	plot_free(p);
 }
 
 static void test_str()
