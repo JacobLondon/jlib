@@ -11,7 +11,7 @@ char *strdup(const char *cstr);
 
 /* use format modifiers to cat to a string with size reallocation
    implementation only accepts specifiers, using flags, widths,
-   or precisions is undefined 
+   or precisions is undefined
    
    returns the cat'ed string */
 char *strcatf(char *base, const char *fmt, ...);

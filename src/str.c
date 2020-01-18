@@ -33,61 +33,135 @@ char *strcatf(char *dest, const char *fmt, ...)
 {
 	size_t destlen;
 	size_t fmtlen = strlen(fmt);
+	va_list arglist;
+	va_start(arglist, fmt);
+
+	/* allow for NULL dest, create a new string */
 	if (dest)
 		destlen = strlen(dest);
 	else
 		destlen = 0;
 
-	va_list arglist;
-	va_start(arglist, fmt);
-
-	size_t i, cap;
+	/* record the number of bytes needed to hold the formatted string */
+	size_t i, bytes;
 	char *tmp;
-	char ch;
-	for (i = 0, cap = destlen; i < fmtlen; i++) {
+	for (i = 0, bytes = destlen; i < fmtlen; i++) {
 		if (fmt[i] == '%') {
 			switch(fmt[i + 1]) {
-			/* modifiers */
-			case 'h': case 'l': case 'j': case 'z': case 't':
-			/* integers */
-			case 'd': case 'i': case 'u': case 'o':
-			case 'x': case 'X': case 'p':
+			/* short */
+			case 'h': {
+				switch (fmt[i + 2]) {
+				/* char: hh[diuoxX] */
+				case 'h': {
+					switch (fmt[i + 3]) {
+					case 'd': case 'i': case 'u':
+					case 'o': case 'x': case 'X':
+						(void)va_arg(arglist, int); i++;
+						break;
+					default:
+						goto Error;
+					}
+					break;
+				}
+				/* short int: h[diuoxX] */
+				case 'd': case 'i': case 'u':
+				case 'o': case 'x': case 'X':
+					(void)va_arg(arglist, int); i++; 
+					break;
+				default:
+					goto Error;
+				}
+				i++;
+				goto Increment;
+			} /* end short */
+
+			/* long */
+			case 'l': {
+				switch (fmt[i + 2]) {
+				/* long long int: ll[diuoxX] */
+				case 'l': {
+					switch (fmt[i + 3]) {
+					case 'd': case 'i': case 'u':
+					case 'o': case 'x': case 'X':
+						(void)va_arg(arglist, long long); i++;
+						break;
+					default:
+						goto Error;
+					}
+					break;
+				}
+				/* double: lf */
+				case 'f': case 'F':
+					(void)va_arg(arglist, double); i++;
+					break;
+				/* long int: l[diuoxX] */
+				case 'd': case 'i': case 'u':
+				case 'o': case 'x': case 'X':
+					(void)va_arg(arglist, long); i++;
+					break;
+				default:
+					goto Error;
+				}
+				i++;
+				goto Increment;
+			} /* end long */
+
 			/* floats */
 			case 'f': case 'F': case 'e': case 'E':
 			case 'g': case 'G': case 'a': case 'A':
-				cap += 17;
-				i++;
-/* TODO: Claim each va_arg with proper sizing */
+				(void)va_arg(arglist, double); i++;
+				goto Increment;
+			/* long double */
+			case 'L':
+				(void)va_arg(arglist, long double); i++;
+				goto Increment;
+			/* int */
+			case 'd': case 'i':
+				(void)va_arg(arglist, int); i++;
+				goto Increment;
+			/* unsigned int */
+			case 'u': case 'o': case 'x': case 'X':
+				(void)va_arg(arglist, unsigned); i++;
+				goto Increment;
+			case 'p': /* pointer */
+			case 'j': /* intmax_t or uintmax_t */
+			case 'z': /* size_t */
+			case 't': /* ptrdiff_t */
+				(void)va_arg(arglist, size_t); i++;
+				goto Increment;
+
+			Increment:
+				bytes += 17;
 				break;
 			/* single chars */
 			case 'c': case '%':
-				cap++;
-				i++;
+				(void)va_arg(arglist, int);
+				bytes++; i++;
 				break;
 			/* nothing */
 			case 'n':
+				(void)va_arg(arglist, int);
 				i++;
 				break;
 			/* strings */
 			case 's':
 				tmp = va_arg(arglist, char *);
-				cap += strlen(tmp);
+				bytes += strlen(tmp);
 				i++;
 				break;
 			default:
-				i++;
-				break;
+				goto Error;
 			}
-		} else
-			cap++;
+		} else /* end if('%'), is a regular character */
+			bytes++;
 	}
-	cap++;
+	bytes++;
 	va_end(arglist);
 
 	if (dest)
-		tmp = (char *)realloc(dest, cap + 1);
+		tmp = (char *)realloc(dest, bytes + 1);
 	else
-		tmp = (char *)calloc(cap + 1, sizeof(char));
+		tmp = (char *)calloc(bytes + 1, sizeof(char));
 
 	if (!tmp) {
 		fputs("Error: Could not realloc in strcatf", stderr);
@@ -95,22 +169,25 @@ char *strcatf(char *dest, const char *fmt, ...)
 	}
 	dest = tmp;
 
+	/* append to the format string */
 	va_start(arglist, fmt);
-	vsnprintf(&dest[destlen], cap - destlen, fmt, arglist);
+	vsnprintf(&dest[destlen], bytes - destlen, fmt, arglist);
 	va_end(arglist);
 
 	/* cut off extraneous 0's */
-	printf("Got here\n");
-	/*size_t smallen = strlen(dest);
-	tmp = (char *)realloc(dest, smallen + 1);
+	destlen = strlen(dest);
+	tmp = (char *)realloc(dest, destlen + 1);
 	if (!tmp) {
 		fputs("Error: Could not shrink in strcatf", stderr);
 		exit(-1);
 	}
-	dest = tmp;*/
-	/*dest[cap + 1] = 0; /* NULL term */
+	dest = tmp;
+	dest[destlen + 1] = 0; /* NULL term */
 
 	return dest;
+Error:
+	fputs("Error: Invalid strcatf format specifier", stderr);
+	exit(-1);
 }
 
 STRCAT_LOOKUP(char, c)

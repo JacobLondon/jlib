@@ -161,7 +161,8 @@ static void test_str()
 	char *lit = strdup("1234567890");
 	print("literal = %s\n", lit);
 
-	char *build = strcatf(NULL, "%d %s", 1, "tester");
+	char *build = strcatf(NULL, "%d %lf %s", 1, 177.2, "tester");
+	build = strcatf(build, " %llu", 10000ULL);
 	println("%s", build);
 }
 
