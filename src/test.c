@@ -127,21 +127,24 @@ static void test_fmap()
 	puts("Success!");
 }
 
-static void test_plot()
+static void test_py()
 {
-	/*plot_test(); */
 	int x[5] = {0, 1, 2, 3, 4};
-	char *b = plot_itoa(x, 5);
-	println("%s", b);
+	char *py_x = python_iatoa("x", x, 5);
+	println("%s", py_x);
 
-	int y[5] = {15, 16, 17, 18, 19};
-
-	struct plot *p = plot_new(0, 0, PLOT_SUBPLOT);
-	plot_sub_new(p, 0, 0, "A vs B vs C");
-	plot_sub_insert(p, 0, 0, x, y, "-g", PLOT_INT, 5);
-	plot_sub_insert(p, 0, 0, y, x, "-o", PLOT_INT, 5);
-	plot_show();
-	plot_free(p);
+	python_init();
+	/*python_run("from time import time,ctime\n"
+						"print('Today is',ctime(time()))\n");*/
+	python_run(
+		"import numpy as np\n"
+	);
+	python_run(py_x);
+	python_run(
+		"x = np.array(x)\n"
+		"print(x)\n"
+	);
+	python_exit();
 }
 
 static void test_str()
@@ -157,6 +160,9 @@ static void test_str()
 
 	char *lit = strdup("1234567890");
 	print("literal = %s\n", lit);
+
+	char *build = strcatf(NULL, "%d %s", 1, "tester");
+	println("%s", build);
 }
 
 static void test_timer()
@@ -185,14 +191,14 @@ int main(int argc, char **argv)
 		test_parray();
 	else if (arg_check(argc, argv, "--fmap"))
 		test_fmap();
-	else if (arg_check(argc, argv, "--plot"))
-		test_plot();
+	else if (arg_check(argc, argv, "--py"))
+		test_py();
 	else if (arg_check(argc, argv, "--str"))
 		test_str();
 	else if (arg_check(argc, argv, "--timer"))
 		test_timer();
 	else {
-		puts("Usage:\n--arg\n--debug\n--farray\n--parray\n--plot\n--fmap\n--str\n--timer");
+		puts("Usage:\n--arg\n--debug\n--farray\n--parray\n--py\n--fmap\n--str\n--timer");
 	}
 
 	return 0;

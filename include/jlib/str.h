@@ -9,6 +9,13 @@ int streq(const char *str0, const char *str1);
 char *strdup(const char *cstr);
 #endif /* strdup */
 
+/* use format modifiers to cat to a string with size reallocation
+   implementation only accepts specifiers, using flags, widths,
+   or precisions is undefined 
+   
+   returns the cat'ed string */
+char *strcatf(char *base, const char *fmt, ...);
+
 #define _STRINGIFY(x) #x
 #define STRINGIFY(x) _STRINGIFY(x)
 
@@ -38,5 +45,6 @@ STRCAT_LOOKUP_PROTO(long long int, lld);
 STRCAT_LOOKUP_PROTO(unsigned long long int, llu);
 STRCAT_LOOKUP_PROTO(float, f);
 STRCAT_LOOKUP_PROTO(double, lf);
+void strcat_safe(char *destination, char *source);
 
 #endif /* JLIB_STR_H */
