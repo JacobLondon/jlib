@@ -9,8 +9,11 @@
 #define PLOT_MAX_NUMBER_LENGTH 20
 #define PLOT_DEFAULT_PROG_SIZE 256
 #define PLOT_DEFAULT_ARG_SIZE 128
+#define PLOT_DEFAULT_AXIS_COUNT 1
+#define PLOT_DEFAULT_SCALING 2
 
 enum plot_types {
+	PLOT_INVALID,
 	PLOT_SIMPLE,
 	PLOT_SUBPLOT,
 	PLOT_INT,
@@ -18,21 +21,31 @@ enum plot_types {
 	PLOT_DOUBLE
 };
 
+struct layer {
+	void *axis_x, *axis_y;
+	char *options;
+	size_t count;
+	unsigned type;
+};
+
 struct subplot {
 	size_t x, y;
-	char *args;  /* x-axis, y-axis, options, ... repeat */
+	size_t cap, size; /* size and capacity of axis_x/y and options */
+	/*void **axis_x, **axis_y; /* hold pointers to different sets of data */
+	/*char **options; /* options for each data set */
 	char *title;
-	size_t argc;
+	/*size_t *count;  /* num of elements in each axis */
+	/*unsigned *type; /* type of elements in each axis */
+	struct layer *layers;
 };
 
 struct plot {
 	char *program;
 	struct subplot **subplots;
 	unsigned w, h;
-	unsigned type;
 };
 
-struct plot *plot_new(unsigned w, unsigned h, int type);
+struct plot *plot_new(unsigned w, unsigned h);
 void plot_free(struct plot *self);
 void plot_sub_new(struct plot *self, size_t x, size_t y, char *title);
 void plot_sub_insert(struct plot *self, size_t x, size_t y,

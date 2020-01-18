@@ -140,6 +140,7 @@ static void test_plot()
 	plot_sub_new(p, 0, 0, "A vs B vs C");
 	plot_sub_insert(p, 0, 0, x, y, "-g", PLOT_INT, 5);
 	plot_sub_insert(p, 0, 0, y, x, "-o", PLOT_INT, 5);
+	plot_show();
 	plot_free(p);
 }
 
