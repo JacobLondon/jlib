@@ -46,10 +46,7 @@ char *strcatf(char *dest, const char *fmt, ...)
 	char ch;
 	for (i = 0, cap = destlen; i < fmtlen; i++) {
 		if (fmt[i] == '%') {
-			printf("Here 1\n");
-			ch = fmt[i + 1];
-			printf("Here %c\n", ch);
-			switch(ch) {
+			switch(fmt[i + 1]) {
 			/* modifiers */
 			case 'h': case 'l': case 'j': case 'z': case 't':
 			/* integers */
@@ -60,6 +57,7 @@ char *strcatf(char *dest, const char *fmt, ...)
 			case 'g': case 'G': case 'a': case 'A':
 				cap += 17;
 				i++;
+/* TODO: Claim each va_arg with proper sizing */
 				break;
 			/* single chars */
 			case 'c': case '%':
@@ -80,7 +78,6 @@ char *strcatf(char *dest, const char *fmt, ...)
 				i++;
 				break;
 			}
-			printf("Here 3\n");
 		} else
 			cap++;
 	}
