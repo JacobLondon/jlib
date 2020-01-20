@@ -7,9 +7,14 @@ extern int _InternalHerePass;
 #define HERE_OFF _InternalHerePass = 0
 #define HERE_ON _InternalHerePass = 1
 
+#ifndef _STRINGIFY && STRINGIFY
+#define _STRINGIFY(x) #x
+#define STRINGIFY(x) _STRINGIFY(x)
+#endif /* STRINGIFY */
+
 #define HERE(num) \
 	if (_InternalHerePass) \
-		fprintf(stderr, "%s:%s:%d: Here %d\n", __FILE__, __func__, __LINE__, num)
+		fprintf(stderr, "%s:%s:%s: Here %d\n", __FILE__, __func__, STRINGIFY(__LINE__), num)
 
 void halt(const char *message);
 
