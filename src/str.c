@@ -1,5 +1,7 @@
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdint.h>
+#include <math.h>
 
 #include <jlib/str.h>
 
@@ -66,7 +68,7 @@ char *strcatf(char *dest, const char *fmt, ...)
 				/* short int: h[diuoxX] */
 				case 'd': case 'i': case 'u':
 				case 'o': case 'x': case 'X':
-					(void)va_arg(arglist, int); i++; 
+					(void)va_arg(arglist, int); i++;
 					break;
 				default:
 					goto Error;
@@ -188,6 +190,133 @@ char *strcatf(char *dest, const char *fmt, ...)
 Error:
 	fputs("Error: Invalid strcatf format specifier", stderr);
 	exit(-1);
+}
+
+size_t strfmtlen_d(long long number)
+{
+	size_t count = 0;
+
+	/* sign */
+	if (number < 0)
+		count++;
+
+	while (number != 0) {
+		number /= 10;
+		count++;
+	}
+	return count;
+}
+
+size_t strfmtlen_u(unsigned long long number)
+{
+	size_t count = 0;
+
+	while (number != 0) {
+		number /= 10;
+		count++;
+	}
+	return count;
+}
+
+
+size_t strfmtlen_o(unsigned long long number)
+{
+	size_t count = 0;
+
+	while (number != 0) {
+		number >>= 3;
+		count++;
+	}
+	return count; /* 0o omitted */
+}
+
+size_t strfmtlen_x(unsigned long long number)
+{
+	size_t count = 0;
+
+	while (number != 0) {
+		number >>= 4;
+		count++;
+	}
+	return count; /* 0x omitted */
+}
+
+size_t strfmtlen_f(float number)
+{
+	/* Sign (1) Exponent (8) Mantissa (23) */
+
+	union {
+		float f;
+		uint32_t i;
+	} b;
+	b.f = number;
+
+	int sign = (b.i >> (32 - 1)); /* msb */
+	int exponent = (b.i >> (32 - 9)) & 0xFFU;
+	const int EXPONENT_BIAS = 0x7F;
+	/* uint32_t mantissa = (b.i & 0x7FFFFFU); */
+
+	size_t count = 0;
+
+	/* '-' */
+	if (sign)
+		count++;
+	
+	/* infinity or NaN: 'inf' */
+	if (exponent == 0xFF) {
+		count += 3;
+		return count;
+	}
+	/* zero or subnormal: '0' */
+	else if (exponent == 0) {
+		count += 1;
+	}
+	/* digits left of decimal */
+	else {
+		count += (size_t)log2f((float)(exponent - EXPONENT_BIAS)) + 1;
+	}
+
+	/* fractional part: '.XXXXXX' */
+	return count + 1 + 6; /* 6 right of decimal by default */
+}
+
+size_t strfmtlen_lf(double number)
+{
+	/* Sign (1) Exponent (11) Mantissa (52) */
+
+	union {
+		double f;
+		uint64_t i;
+	} b;
+	b.f = number;
+
+	int sign = (b.i >> (64 - 1)); /* msb */
+	int exponent = (b.i >> (64 - 12)) & 0x7FFU;
+	const int EXPONENT_BIAS = 0x3FF;
+	/* uint64_t mantissa = (b.i & 0xFFFFFFFFFFFFFULL); */
+
+	size_t count = 0;
+
+	/* '-' */
+	if (sign)
+		count++;
+	
+	/* infinity or NaN: 'inf' */
+	if (exponent == 0x7FF) {
+		count += 3;
+		return count;
+	}
+	/* zero or subnormal: '0' */
+	else if (exponent == 0) {
+		count += 1;
+	}
+	/* digits left of decimal */
+	else {
+		count += (size_t)log2f((float)(exponent - EXPONENT_BIAS)) + 1;
+	}
+
+	/* fractional part: '.XXXXXX' */
+	return count + 1 + 6; /* 6 right of decimal by default */
 }
 
 STRCAT_LOOKUP(char, c)
