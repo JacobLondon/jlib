@@ -28,15 +28,27 @@ void halt(const char *message);
 
    Written by Rusty Russell, public domain, http://ccodearchive.net/ */
 
-#ifdef NDEBUG
-	#define assert_static(cond) ((void)0)
-#else
-	#define assert_static_expr(cond) \
-		(sizeof(char [1 - 2*!(cond)]) - 1)
+#if !defined(static_assert)
+	#ifdef NDEBUG
+		#define assert_static(cond) ((void)0)
+	#else
+		#define assert_static_expr(cond) \
+			(sizeof(char [1 - 2*!(cond)]) - 1)
 
-	#define assert_static(cond) do { \
-			(void)assert_static_expr(cond); \
-		} while(0)
-#endif /* NDEBUG */
+		#define assert_static(cond) do { \
+				(void)assert_static_expr(cond); \
+			} while(0)
+
+	#endif /* NDEBUG */
+#endif
+
+#define uassert(expression) \
+	do { \
+		if (!(expression)) { \
+			fprintf(stderr, "%s:%s:%s: Assertion failure: '"#expression "'\n", \
+				__FILE__, __func__, STRINGIFY(__LINE__)); \
+			exit(-1); \
+		} \
+	} while (0)
 
 #endif /* JLIB_DEBUG_H */

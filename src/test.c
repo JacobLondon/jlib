@@ -1,3 +1,4 @@
+#include <float.h>
 #include <jlib/jlib.h>
 
 static void test_arg()
@@ -149,8 +150,20 @@ static void test_py()
 
 static void test_str()
 {
-	char *test = calloc(1000, 1);
+	uassert(strfmtlen_d(INT_MAX) == 10);
+	uassert(strfmtlen_d(0) == 1);
+	uassert(strfmtlen_d(INT_MIN) == 11);
+	uassert(strfmtlen_u(0xFFFFFFFFFFFFFFFFULL) == 20);
+	uassert(strfmtlen_u(0) == 1);
+	uassert(strfmtlen_o(0xFFFFFFFFULL) == 11);
+	uassert(strfmtlen_o(0) == 1);
+	uassert(strfmtlen_x(0xFFFFFFFFFFFFFFFFULL) == 16);
+	uassert(strfmtlen_x(0) == 1);
+	println("%f", FLT_MAX);
+	uassert(strfmtlen_f(FLT_MAX) == 46);
 
+	/*char *test = calloc(1000, 1);
+	
 	strcat(test, "ok");
 	strcat(test, "ok");
 	strcat(test, "ok");
@@ -163,6 +176,7 @@ static void test_str()
 	char *build = strcatf(NULL, "%d %lf %s", 1, 177.2, "tester");
 	build = strcatf(build, " %llu", 10000ULL);
 	println("%s", build);
+	*/
 }
 
 static void test_timer()

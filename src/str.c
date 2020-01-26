@@ -200,6 +200,9 @@ Error:
 
 size_t strfmtlen_d(long long number)
 {
+	if (number == 0)
+		return 1;
+	
 	size_t count = 0;
 
 	/* sign */
@@ -215,6 +218,9 @@ size_t strfmtlen_d(long long number)
 
 size_t strfmtlen_u(unsigned long long number)
 {
+	if (number == 0)
+		return 1;
+	
 	size_t count = 0;
 
 	while (number != 0) {
@@ -227,6 +233,9 @@ size_t strfmtlen_u(unsigned long long number)
 
 size_t strfmtlen_o(unsigned long long number)
 {
+	if (number == 0)
+		return 1;
+
 	size_t count = 0;
 
 	while (number != 0) {
@@ -238,6 +247,9 @@ size_t strfmtlen_o(unsigned long long number)
 
 size_t strfmtlen_x(unsigned long long number)
 {
+	if (number == 0)
+		return 1;
+
 	size_t count = 0;
 
 	while (number != 0) {
@@ -279,10 +291,16 @@ size_t strfmtlen_f(float number)
 	}
 	/* digits left of decimal */
 	else {
-		count += (size_t)log2f((float)(exponent - EXPONENT_BIAS)) + 1;
+		size_t exp10 = (size_t)log2((double)(exponent - EXPONENT_BIAS)) + 1;
+		printf("exp = %ld\n", exponent - EXPONENT_BIAS);
+		count += exp10;
 	}
 
+	/* SOLN: Put the mantissa (1 appended left) into an int, but 
+	   remove mantissa digits right of the decimal point */
+
 	/* fractional part: '.XXXXXX' */
+	printf("Actual: %lu\n", count + 1 + 6);
 	return count + 1 + 6; /* 6 right of decimal by default */
 }
 
@@ -318,7 +336,8 @@ size_t strfmtlen_lf(double number)
 	}
 	/* digits left of decimal */
 	else {
-		count += (size_t)log2f((float)(exponent - EXPONENT_BIAS)) + 1;
+		size_t exp10 = (size_t)log2((double)(exponent - EXPONENT_BIAS)) + 1;
+		count += exp10;
 	}
 
 	/* fractional part (default len): '.XXXXXX' */
