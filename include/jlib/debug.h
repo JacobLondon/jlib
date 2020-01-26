@@ -7,9 +7,11 @@ extern int _InternalHerePass;
 #define HERE_OFF _InternalHerePass = 0
 #define HERE_ON _InternalHerePass = 1
 
-#ifndef _STRINGIFY && STRINGIFY
-#define _STRINGIFY(x) #x
-#define STRINGIFY(x) _STRINGIFY(x)
+#ifndef _STRINGIFY
+	#define _STRINGIFY(x) #x
+	#ifndef STRINGIFY
+		#define STRINGIFY(x) _STRINGIFY(x)
+	#endif
 #endif /* STRINGIFY */
 
 #define HERE(num) \

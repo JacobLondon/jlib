@@ -155,7 +155,6 @@ static void test_str()
 	strcat(test, "ok");
 	strcat(test, "ok");
 	strcat(test, "wow");
-	strcat_lld(test, 100LL);
 	println("test = %s", test);
 
 	char *lit = strdup("1234567890");

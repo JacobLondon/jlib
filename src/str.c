@@ -47,16 +47,6 @@ char *strcatf(char *dest, const char *fmt, ...)
 	/* record the number of bytes needed to hold the formatted string */
 	size_t i, bytes;
 	char *tmp;
-	union {
-		int i;
-		unsigned u;
-		long l;
-		long long ll;
-		float f;
-		double d;
-		long double ld;
-		size_t s;
-	} arg;
 
 	for (i = 0, bytes = destlen; i < fmtlen; i++) {
 		if (fmt[i] == '%') {
@@ -68,42 +58,24 @@ char *strcatf(char *dest, const char *fmt, ...)
 				case 'h': {
 					switch (fmt[i + 3]) {
 					case 'd':
-					case 'i':
-						bytes += strfmtlen_d(va_arg(arglist, int));
-						break;
-					case 'u':
-						bytes += strfmtlen_u(va_arg(arglist, unsigned));
-						break;
-					case 'o':
-						bytes += strfmtlen_o(va_arg(arglist, unsigned));
-						break;
+					case 'i': bytes += strfmtlen_d(va_arg(arglist, int)); break;
+					case 'u': bytes += strfmtlen_u(va_arg(arglist, unsigned)); break;
+					case 'o': bytes += strfmtlen_o(va_arg(arglist, unsigned)); break;
 					case 'x':
-					case 'X':
-						bytes += strfmtlen_x(va_arg(arglist, int));
-						break;
-					default:
-						goto Error;
+					case 'X': bytes += strfmtlen_x(va_arg(arglist, int)); break;
+					default: goto Error;
 					}
 					i++;
 					break;
 				}
 				/* short int: h[diuoxX] */
 				case 'd':
-				case 'i':
-					bytes += strfmtlen_d(va_arg(arglist, int));
-					break;
-				case 'u':
-					bytes += strfmtlen_u(va_arg(arglist, unsigned));
-					break;
-				case 'o':
-					bytes += strfmtlen_o(va_arg(arglist, unsigned));
-					break;
+				case 'i': bytes += strfmtlen_d(va_arg(arglist, int)); break;
+				case 'u': bytes += strfmtlen_u(va_arg(arglist, unsigned)); break;
+				case 'o': bytes += strfmtlen_o(va_arg(arglist, unsigned)); break;
 				case 'x':
-				case 'X':
-					bytes += strfmtlen_x(va_arg(arglist, int));
-					break;
-				default:
-					goto Error;
+				case 'X': bytes += strfmtlen_x(va_arg(arglist, int)); break;
+				default: goto Error;
 				}
 				i++;
 				break;
@@ -116,95 +88,78 @@ char *strcatf(char *dest, const char *fmt, ...)
 				case 'l': {
 					switch (fmt[i + 3]) {
 					case 'd':
-					case 'i':
-						bytes += strfmtlen_d(va_arg(arglist, long long));
-						break;
-					case 'u':
-						bytes += strfmtlen_u(va_arg(arglist, unsigned long long));
-						break;
-					case 'o':
-						bytes += strfmtlen_o(va_arg(arglist, unsigned long long));
-						break;
+					case 'i': bytes += strfmtlen_d(va_arg(arglist, long long)); break;
+					case 'u': bytes += strfmtlen_u(va_arg(arglist, unsigned long long)); break;
+					case 'o': bytes += strfmtlen_o(va_arg(arglist, unsigned long long)); break;
 					case 'x':
-					case 'X':
-						bytes += strfmtlen_x(va_arg(arglist, unsigned long long));
-						break;
-					default:
-						goto Error;
+					case 'X': bytes += strfmtlen_x(va_arg(arglist, unsigned long long)); break;
+					default: goto Error;
 					}
 					i++;
 					break;
 				}
 				/* double: lf */
-				case 'f': case 'F':
-					bytes += strfmtlen_lf(va_arg(arglist, double));
-					i++;
-					break;
+				case 'f':
+				case 'F': bytes += strfmtlen_lf(va_arg(arglist, double)); break;
 				/* long int: l[diuoxX] */
-				case 'd': /* TODO: Complete formatting */
-				case 'i':
-				case 'u':
-				case 'o':
+				case 'd':
+				case 'i': bytes += strfmtlen_d(va_arg(arglist, long)); break;
+				case 'u': bytes += strfmtlen_u(va_arg(arglist, unsigned long)); break;
+				case 'o': bytes += strfmtlen_o(va_arg(arglist, unsigned long)); break;
 				case 'x':
-				case 'X':
-					(void)va_arg(arglist, long); i++;
-					break;
-				default:
-					goto Error;
+				case 'X': bytes += strfmtlen_x(va_arg(arglist, unsigned long)); break;
+				default: goto Error;
 				}
 				i++;
 				break;
 			} /* end long */
 
 			/* floats */
-			case 'f': case 'F': case 'e': case 'E':
-			case 'g': case 'G': case 'a': case 'A':
-				(void)va_arg(arglist, double);
-				i++;
-				break;
+			case 'f':
+			case 'F': bytes += strfmtlen_f(va_arg(arglist, double)); break;
+			case 'e':
+			case 'E': bytes += strfmtlen_e(va_arg(arglist, double)); break;
+			case 'g':
+			case 'G': bytes += strfmtlen_g(va_arg(arglist, double)); break;
+			case 'a':
+			case 'A': bytes += strfmtlen_a(va_arg(arglist, double)); break;
 			/* long double */
-			case 'L':
-				(void)va_arg(arglist, long double);
-				i++;
-				break;
+			case 'L': bytes += strfmtlen_lf(va_arg(arglist, long double)); break;
 			/* int */
-			case 'd': case 'i':
-				(void)va_arg(arglist, int);
-				i++;
-				break;
+			case 'd':
+			case 'i': bytes += strfmtlen_d(va_arg(arglist, int)); break;
 			/* unsigned int */
-			case 'u': case 'o': case 'x': case 'X':
-				(void)va_arg(arglist, unsigned);
-				i++;
-				break;
-			case 'p': /* pointer */
-			case 'j': /* intmax_t or uintmax_t */
-			case 'z': /* size_t */
-			case 't': /* ptrdiff_t */
-				(void)va_arg(arglist, size_t);
-				i++;
-				break;
+			case 'u': bytes += strfmtlen_u(va_arg(arglist, unsigned)); break;
+			case 'o': bytes += strfmtlen_o(va_arg(arglist, unsigned)); break;
+			case 'x':
+			case 'X': bytes += strfmtlen_x(va_arg(arglist, unsigned)); break;
+			/* pointer */
+			case 'p': bytes += strfmtlen_p(va_arg(arglist, size_t)); break;
+			/* intmax_t or uintmax_t */
+			case 'j': bytes += strfmtlen_j(va_arg(arglist, size_t)); break;
+			/* size_t */
+			case 'z': bytes += strfmtlen_z(va_arg(arglist, size_t)); break;
+			/* ptrdiff_t */
+			case 't': bytes += strfmtlen_t(va_arg(arglist, size_t)); break;
 			/* single chars */
-			case 'c': case '%':
+			case 'c':
+			case '%':
 				(void)va_arg(arglist, int);
-				bytes++; i++;
+				bytes++;
 				break;
 			/* nothing */
 			case 'n':
 				(void)va_arg(arglist, int);
-				i++;
 				break;
 			/* strings */
 			case 's':
 				tmp = va_arg(arglist, char *);
 				bytes += strlen(tmp);
-				i++;
 				break;
 			default:
 				goto Error;
-			Success:
-				break;
 			}
+			i++;
 		} else /* end if('%'), is a regular character */
 			bytes++;
 	}
