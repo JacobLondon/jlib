@@ -28,37 +28,13 @@ size_t strfmtlen_x(unsigned long long number); /* hex */
 #define strfmtlen_p strfmtlen_x /* pointer is hex */
 size_t strfmtlen_f(float number); /* float 32, assume IEEE 754 and Little Endian */
 size_t strfmtlen_lf(double number); /* float 64, assume IEEE 754 and Little Endian */
-/* TODO: eE gG aA */
+size_t strfmtlen_e(double number); /* scientific notation, ignore shortest notation */
+#define strfmtlen_g strfmtlen_e
+size_t strfmtlen_a(double number); /* hexadecimal floating point */
+
+void strcat_safe(char *destination, char *source);
 
 #define _STRINGIFY(x) #x
 #define STRINGIFY(x) _STRINGIFY(x)
-
-/**
- * Builder strings
- */
-
-#define STRCAT_MAX 128U /* number value unlikely to have more digits */
-
-#define STRCAT_LOOKUP_PROTO(Type, Spec) \
-	void strcat_##Spec(char *string, Type value)
-
-#define STRCAT_LOOKUP(Type, Spec) \
-void strcat_##Spec(char *dest, Type value) \
-{ \
-	char tmp[STRCAT_MAX] = {0}; \
-	sprintf(tmp, "%" #Spec " ", value); \
-	strncat(dest, tmp, strlen(tmp)); \
-}
-
-STRCAT_LOOKUP_PROTO(char, c);
-STRCAT_LOOKUP_PROTO(int, d);
-STRCAT_LOOKUP_PROTO(unsigned int, u);
-STRCAT_LOOKUP_PROTO(long int, ld);
-STRCAT_LOOKUP_PROTO(unsigned long int, lu);
-STRCAT_LOOKUP_PROTO(long long int, lld);
-STRCAT_LOOKUP_PROTO(unsigned long long int, llu);
-STRCAT_LOOKUP_PROTO(float, f);
-STRCAT_LOOKUP_PROTO(double, lf);
-void strcat_safe(char *destination, char *source);
 
 #endif /* JLIB_STR_H */
