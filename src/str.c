@@ -198,6 +198,26 @@ Error:
 	exit(-1);
 }
 
+union dbl {
+    double f;
+    uint64_t i;
+    struct {
+        uint64_t mantissa : 52;
+        uint64_t exponent : 11;
+        uint64_t sign : 1;
+    } fields;
+};
+
+union flt {
+	float f;
+	uint32_t i;
+	struct {
+		uint32_t mantissa : 23;
+		uint32_t exponent : 8;
+		uint64_t sign : 1;
+	} fields;
+};
+
 size_t strfmtlen_d(long long number)
 {
 	if (number == 0)
@@ -263,44 +283,32 @@ size_t strfmtlen_f(float number)
 {
 	/* Sign (1) Exponent (8) Mantissa (23) */
 
-	union {
-		float f;
-		uint32_t i;
-	} b;
+	union flt b;
 	b.f = number;
-
-	int sign = (b.i >> (32 - 1)); /* msb */
-	int exponent = (b.i >> (32 - 9)) & 0xFFU;
-	const int EXPONENT_BIAS = 0x7F;
-	/* uint32_t mantissa = (b.i & 0x7FFFFFU); */
+	/* const int EXPONENT_BIAS = 0x7F; */
 
 	size_t count = 0;
 
 	/* '-' */
-	if (sign)
+	if (b.fields.sign)
 		count++;
 	
 	/* infinity or NaN: 'inf' */
-	if (exponent == 0xFF) {
+	if (b.fields.exponent == 0xFF) {
 		count += 3;
 		return count;
 	}
 	/* zero or subnormal: '0' */
-	else if (exponent == 0) {
+	else if (b.fields.exponent == 0) {
 		count += 1;
 	}
 	/* digits left of decimal */
-	else {
-		size_t exp10 = (size_t)log2((double)(exponent - EXPONENT_BIAS)) + 1;
-		printf("exp = %ld\n", exponent - EXPONENT_BIAS);
-		count += exp10;
+	else while (floor(number) != 0) {
+		number /= 10.0f;
+		count++;
 	}
 
-	/* SOLN: Put the mantissa (1 appended left) into an int, but 
-	   remove mantissa digits right of the decimal point */
-
 	/* fractional part: '.XXXXXX' */
-	printf("Actual: %lu\n", count + 1 + 6);
 	return count + 1 + 6; /* 6 right of decimal by default */
 }
 
@@ -308,36 +316,30 @@ size_t strfmtlen_lf(double number)
 {
 	/* Sign (1) Exponent (11) Mantissa (52) */
 
-	union {
-		double f;
-		uint64_t i;
-	} b;
+	union dbl b;
 	b.f = number;
 
-	int sign = (b.i >> (64 - 1)); /* msb */
-	int exponent = (b.i >> (64 - 12)) & 0x7FFU;
-	const int EXPONENT_BIAS = 0x3FF;
-	/* uint64_t mantissa = (b.i & 0xFFFFFFFFFFFFFULL); */
+	/* const int EXPONENT_BIAS = 0x3FF; */
 
 	size_t count = 0;
 
 	/* '-' */
-	if (sign)
+	if (b.fields.sign)
 		count++;
 	
 	/* infinity or NaN: 'inf' */
-	if (exponent == 0x7FF) {
+	if (b.fields.exponent == 0x7FF) {
 		count += 3;
 		return count;
 	}
 	/* zero or subnormal: '0' */
-	else if (exponent == 0) {
+	else if (b.fields.exponent == 0) {
 		count += 1;
 	}
 	/* digits left of decimal */
-	else {
-		size_t exp10 = (size_t)log2((double)(exponent - EXPONENT_BIAS)) + 1;
-		count += exp10;
+	else while (floor(number) != 0) {
+		number /= 10.0;
+		count++;
 	}
 
 	/* fractional part (default len): '.XXXXXX' */
@@ -353,16 +355,25 @@ size_t strfmtlen_e(double number)
 				 + 6 /*XXXXXX*/
 				 + 1 /*e*/
 				 + 1 /*+-*/;
-	const int EXPONENT_BIAS = 0x3FF;
-	int exponent = (((*(uint64_t *)&number) >> (64 - 12)) & 0x7FFU) - EXPONENT_BIAS;
+	
+	union dbl b;
+	b.f = number;
 
-	/* less than |100| always has 2 digits */
-	if ((exponent < 100) && (exponent > -100))
-		count += 2;
-	/* count digits */
-	else while (exponent != 0) {
+	const int EXPONENT_BIAS = 0x3FF;
+	b.fields.exponent -= EXPONENT_BIAS;
+
+	if (b.fields.sign)
 		count++;
-		exponent /= 10;
+
+	printf("Exponent: %d\n", b.fields.exponent);
+	/* less than |100| always has 2 digits */
+	if ((b.fields.exponent < 100) && (b.fields.exponent > -100)) {
+		count += 2;
+	}
+	/* count digits */
+	else while (b.fields.exponent != 0) {
+		b.fields.exponent /= 10;
+		count++;
 	}
 	return count;
 }
@@ -370,15 +381,10 @@ size_t strfmtlen_e(double number)
 size_t strfmtlen_a(double number)
 {
 	/* always a double for this format... */
-	union {
-		double f;
-		uint64_t i;
-	} b;
+	union dbl b;
 	b.f = number;
 
-	int sign = (b.i >> (64 - 1)); /* msb */
 	const int EXPONENT_BIAS = 0x3FF;
-	int exponent = ((b.i >> (64 - 12)) & 0x7FFU) - EXPONENT_BIAS;
 
 	/* X.XXXXXXXXXXXXXp[+-] */
 	size_t count = 1  /*X*/
@@ -387,12 +393,12 @@ size_t strfmtlen_a(double number)
 				 + 1  /*p*/
 				 + 1; /*+-*/
 
-	if (sign)
+	if (b.fields.sign)
 		count++;
 
 	/* count exponent size */
-	while (exponent != 0) {
-		exponent /= 10;
+	while (b.fields.exponent != 0) {
+		b.fields.exponent /= 10;
 		count++;
 	}
 	return count;

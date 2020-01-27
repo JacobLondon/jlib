@@ -159,8 +159,19 @@ static void test_str()
 	uassert(strfmtlen_o(0) == 1);
 	uassert(strfmtlen_x(0xFFFFFFFFFFFFFFFFULL) == 16);
 	uassert(strfmtlen_x(0) == 1);
-	println("%f", FLT_MAX);
 	uassert(strfmtlen_f(FLT_MAX) == 46);
+	uassert(strfmtlen_f(10.0f) == 9);
+	uassert(strfmtlen_lf(DBL_MAX) == 316);
+	uassert(strfmtlen_lf(1e10) == 18);
+	
+	println("%e", 10.0);
+	uassert(strfmtlen_e(10.0) == 12);
+	uassert(strfmtlen_e(-FLT_MAX) == 12);
+	uassert(strfmtlen_e(DBL_MAX) == 13);
+	uassert(strfmtlen_e(0.0) == 12);
+	
+	println("%a", DBL_MAX);
+	uassert(strfmtlen_a(DBL_MAX) == 23);
 
 	/*char *test = calloc(1000, 1);
 	
