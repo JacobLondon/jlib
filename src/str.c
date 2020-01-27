@@ -5,6 +5,21 @@
 
 #include <jlib/str.h>
 
+enum { BUF_LEN = 512 }; /* DBL_MAX's length = 316 characters, go to 512 for good measure */
+
+static char _InternalFmtBuf[BUF_LEN];
+static void clear_fmt_buf()
+{
+	int i = 0;
+	for (; i < BUF_LEN; i++) {
+		/* unlikely */
+		if (__builtin_expect(_InternalFmtBuf[i] == 0, 0))
+			break;
+		else
+			_InternalFmtBuf[i] = 0;
+	}
+}
+
 int streq(const char *cstr0, const char *cstr1)
 {
 	size_t i;
@@ -167,9 +182,9 @@ char *strcatf(char *dest, const char *fmt, ...)
 	va_end(arglist);
 
 	if (dest)
-		tmp = (char *)realloc(dest, bytes + 1);
+		tmp = (char *)realloc(dest, bytes);
 	else
-		tmp = (char *)calloc(bytes + 1, sizeof(char));
+		tmp = (char *)calloc(bytes, sizeof(char));
 
 	if (!tmp) {
 		fputs("Error: Could not realloc in strcatf", stderr);
@@ -182,41 +197,14 @@ char *strcatf(char *dest, const char *fmt, ...)
 	vsnprintf(&dest[destlen], bytes - destlen, fmt, arglist);
 	va_end(arglist);
 
-	/* cut off extraneous 0's */
-	destlen = strlen(dest);
-	tmp = (char *)realloc(dest, destlen + 1);
-	if (!tmp) {
-		fputs("Error: Could not shrink in strcatf", stderr);
-		exit(-1);
-	}
-	dest = tmp;
-	dest[destlen + 1] = 0; /* NULL term */
+	/* NULL term */
+	dest[bytes] = 0;
 
 	return dest;
 Error:
 	fputs("Error: Invalid strcatf format specifier", stderr);
 	exit(-1);
 }
-
-union dbl {
-    double f;
-    uint64_t i;
-    struct {
-        uint64_t mantissa : 52;
-        uint64_t exponent : 11;
-        uint64_t sign : 1;
-    } fields;
-};
-
-union flt {
-	float f;
-	uint32_t i;
-	struct {
-		uint32_t mantissa : 23;
-		uint32_t exponent : 8;
-		uint64_t sign : 1;
-	} fields;
-};
 
 size_t strfmtlen_d(long long number)
 {
@@ -279,130 +267,18 @@ size_t strfmtlen_x(unsigned long long number)
 	return count; /* 0x omitted */
 }
 
-size_t strfmtlen_f(float number)
-{
-	/* Sign (1) Exponent (8) Mantissa (23) */
-
-	union flt b;
-	b.f = number;
-	/* const int EXPONENT_BIAS = 0x7F; */
-
-	size_t count = 0;
-
-	/* '-' */
-	if (b.fields.sign)
-		count++;
-	
-	/* infinity or NaN: 'inf' */
-	if (b.fields.exponent == 0xFF) {
-		count += 3;
-		return count;
-	}
-	/* zero or subnormal: '0' */
-	else if (b.fields.exponent == 0) {
-		count += 1;
-	}
-	/* digits left of decimal */
-	else while (floor(number) != 0) {
-		number /= 10.0f;
-		count++;
+#define STRFMTLEN_X(Specifier, Type) \
+	size_t strfmtlen_##Specifier(Type number) \
+	{ \
+		clear_fmt_buf(); \
+		snprintf(_InternalFmtBuf, BUF_LEN, "%" #Specifier, number); \
+		return strlen(_InternalFmtBuf); \
 	}
 
-	/* fractional part: '.XXXXXX' */
-	return count + 1 + 6; /* 6 right of decimal by default */
-}
-
-size_t strfmtlen_lf(double number)
-{
-	/* Sign (1) Exponent (11) Mantissa (52) */
-
-	union dbl b;
-	b.f = number;
-
-	/* const int EXPONENT_BIAS = 0x3FF; */
-
-	size_t count = 0;
-
-	/* '-' */
-	if (b.fields.sign)
-		count++;
-	
-	/* infinity or NaN: 'inf' */
-	if (b.fields.exponent == 0x7FF) {
-		count += 3;
-		return count;
-	}
-	/* zero or subnormal: '0' */
-	else if (b.fields.exponent == 0) {
-		count += 1;
-	}
-	/* digits left of decimal */
-	else while (floor(number) != 0) {
-		number /= 10.0;
-		count++;
-	}
-
-	/* fractional part (default len): '.XXXXXX' */
-	return count + 1  /*.*/
-				 + 6; /*XXXXXX */
-}
-
-size_t strfmtlen_e(double number)
-{
-	/* default format X.XXXXXXe[+-] */
-	size_t count = 1 /*X*/
-				 + 1 /*.*/
-				 + 6 /*XXXXXX*/
-				 + 1 /*e*/
-				 + 1 /*+-*/;
-	
-	union dbl b;
-	b.f = number;
-
-	const int EXPONENT_BIAS = 0x3FF;
-	b.fields.exponent -= EXPONENT_BIAS;
-
-	if (b.fields.sign)
-		count++;
-
-	printf("Exponent: %d\n", b.fields.exponent);
-	/* less than |100| always has 2 digits */
-	if ((b.fields.exponent < 100) && (b.fields.exponent > -100)) {
-		count += 2;
-	}
-	/* count digits */
-	else while (b.fields.exponent != 0) {
-		b.fields.exponent /= 10;
-		count++;
-	}
-	return count;
-}
-
-size_t strfmtlen_a(double number)
-{
-	/* always a double for this format... */
-	union dbl b;
-	b.f = number;
-
-	const int EXPONENT_BIAS = 0x3FF;
-
-	/* X.XXXXXXXXXXXXXp[+-] */
-	size_t count = 1  /*X*/
-				 + 1  /*.*/
-				 + 13 /*XXXXXXXXXXXXX*/
-				 + 1  /*p*/
-				 + 1; /*+-*/
-
-	if (b.fields.sign)
-		count++;
-
-	/* count exponent size */
-	while (b.fields.exponent != 0) {
-		b.fields.exponent /= 10;
-		count++;
-	}
-	return count;
-}
+STRFMTLEN_X(f, float)
+STRFMTLEN_X(lf, double)
+STRFMTLEN_X(e, double)
+STRFMTLEN_X(a, double)
 
 void strcat_safe(char *destination, char *source)
 {

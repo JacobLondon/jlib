@@ -39,7 +39,7 @@ static void test_debug()
 	HERE_ON;
 	HERE(3);
 
-	assert_static(10 == 10);
+	static_assert(10 == 10);
 	halt("Static assert successful");
 }
 
@@ -159,27 +159,17 @@ static void test_str()
 	uassert(strfmtlen_o(0) == 1);
 	uassert(strfmtlen_x(0xFFFFFFFFFFFFFFFFULL) == 16);
 	uassert(strfmtlen_x(0) == 1);
+
 	uassert(strfmtlen_f(FLT_MAX) == 46);
 	uassert(strfmtlen_f(10.0f) == 9);
 	uassert(strfmtlen_lf(DBL_MAX) == 316);
 	uassert(strfmtlen_lf(1e10) == 18);
-	
-	println("%e", 10.0);
+
 	uassert(strfmtlen_e(10.0) == 12);
-	uassert(strfmtlen_e(-FLT_MAX) == 12);
+	uassert(strfmtlen_e(-FLT_MAX) == 13);
 	uassert(strfmtlen_e(DBL_MAX) == 13);
 	uassert(strfmtlen_e(0.0) == 12);
-	
-	println("%a", DBL_MAX);
 	uassert(strfmtlen_a(DBL_MAX) == 23);
-
-	/*char *test = calloc(1000, 1);
-	
-	strcat(test, "ok");
-	strcat(test, "ok");
-	strcat(test, "ok");
-	strcat(test, "wow");
-	println("test = %s", test);
 
 	char *lit = strdup("1234567890");
 	print("literal = %s\n", lit);
@@ -187,7 +177,7 @@ static void test_str()
 	char *build = strcatf(NULL, "%d %lf %s", 1, 177.2, "tester");
 	build = strcatf(build, " %llu", 10000ULL);
 	println("%s", build);
-	*/
+	
 }
 
 static void test_timer()

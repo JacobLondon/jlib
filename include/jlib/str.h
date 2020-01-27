@@ -9,11 +9,21 @@ int streq(const char *str0, const char *str1);
 char *strdup(const char *cstr);
 #endif /* strdup */
 
-/* use format modifiers to cat to a string with size reallocation
-   implementation only accepts specifiers, using flags, widths,
-   or precisions is undefined
+/* \brief Use printf modifiers to cat to a string with size reallocation.
+   Implementation only accepts specifiers, using flags, widths,
+   or precisions will exit with an error.
+   \param base Only pass NULL or the string to return to
+   \return the cat'ed string 
    
-   returns the cat'ed string */
+   Usage:
+     char *new = strcatf(NULL, "%d", 100);
+       or
+     char *build = strdup("Lorem");
+     build = strcatf(build, "%s", "Ipsum");
+   Else:
+      If base is a different string than the return value,
+      then \a base will point to an invalid address (due to realloc)
+   */
 char *strcatf(char *base, const char *fmt, ...);
 
 /* find the length of the string equivalent of the number */
@@ -26,6 +36,7 @@ size_t strfmtlen_u(unsigned long long number); /* unsigned, intmax, size_t, ptrd
 size_t strfmtlen_o(unsigned long long number); /* octal */
 size_t strfmtlen_x(unsigned long long number); /* hex */
 #define strfmtlen_p strfmtlen_x /* pointer is hex */
+
 size_t strfmtlen_f(float number); /* float 32, assume IEEE 754 and Little Endian */
 size_t strfmtlen_lf(double number); /* float 64, assume IEEE 754 and Little Endian */
 size_t strfmtlen_e(double number); /* scientific notation, ignore shortest notation */
