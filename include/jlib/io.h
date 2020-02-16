@@ -12,5 +12,6 @@
 char *file_read(const char *fname);
 void file_write(const char *fname, const char *cstr);
 void file_append(const char *fname, const char *cstr);
+void file_read_csv(const char *fname, const char *sep, double *mx, size_t x, size_t y);
 
 #endif /* JLIB_IO_H */

@@ -12,7 +12,7 @@
 	do { \
 		if (!((Dest) = malloc((Size)))) { \
 			fprintf(stderr, "%s:%s:%s: Failed to malloc\n", __FILE__, __func__, STRINGIFY(__LINE__)); \
-			exit(-1); \
+			exit(1); \
 		} \
 	} while (0)
 
@@ -20,7 +20,7 @@
 	do { \
 		if (!((Dest) = calloc((Count), (Size)))) { \
 			fprintf(stderr, "%s:%s:%s: Failed to calloc\n", __FILE__, __func__, STRINGIFY(__LINE__)); \
-			exit(-1); \
+			exit(1); \
 		} \
 	} while (0)
 
@@ -29,7 +29,7 @@
 		void *_try_realloc_internal = realloc((Addr), (Size)); \
 		if (!_try_realloc_internal) { \
 			fprintf(stderr, "%s:%s:%s: Failed to realloc\n", __FILE__, __func__, STRINGIFY(__LINE__)); \
-			exit(-1); \
+			exit(1); \
 		} else \
 			(Addr) = _try_realloc_internal; \
 	} while (0)

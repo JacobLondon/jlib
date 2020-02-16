@@ -128,6 +128,20 @@ static void test_fmap()
 	puts("Success!");
 }
 
+static void test_io()
+{
+	double mx[3][4] = {0};
+	int i, j;
+
+	file_read_csv("test/test.csv", ",", (double *)mx, 3, 4);
+	for (i = 0; i < 4; i++) {
+		for (j = 0; j < 3; j++) {
+			print("%lf, ", mx[i][j]);
+		}
+		newline();
+	}
+}
+
 static void test_py()
 {
 	int x[5] = {0, 1, 2, 3, 4};
@@ -212,6 +226,8 @@ int main(int argc, char **argv)
 		test_str();
 	else if (arg_check(argc, argv, "--timer"))
 		test_timer();
+	else if (arg_check(argc, argv, "--io"))
+		test_io();
 	else {
 		puts("Usage:\n--arg\n--debug\n--farray\n--parray\n--py\n--fmap\n--str\n--timer");
 	}

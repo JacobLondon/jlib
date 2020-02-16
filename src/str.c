@@ -36,7 +36,7 @@ char *strdup(const char *cstr)
 	char *build = calloc(strlen(cstr) + 1, sizeof(char));
 	if (!build) {
 		fputs("Error: Could not calloc in strnew\n", stderr);
-		exit(-1);
+		exit(1);
 	}
 	size_t i;
 	for (i = 0; (build[i] = cstr[i]); i++)
@@ -188,7 +188,7 @@ char *strcatf(char *dest, const char *fmt, ...)
 
 	if (!tmp) {
 		fputs("Error: Could not realloc in strcatf", stderr);
-		exit(-1);
+		exit(1);
 	}
 	dest = tmp;
 
@@ -203,7 +203,7 @@ char *strcatf(char *dest, const char *fmt, ...)
 	return dest;
 Error:
 	fputs("Error: Invalid strcatf format specifier", stderr);
-	exit(-1);
+	exit(1);
 }
 
 size_t strfmtlen_d(long long number)
@@ -285,7 +285,7 @@ void strcat_safe(char *destination, char *source)
 	void *tmp = realloc(destination, strlen(destination) + strlen(source) + 1);
 	if (!tmp) {
 		fputs("Error: Could not realloc in strcat_safe", stderr);
-		exit(-1);
+		exit(1);
 	}
 	strcat(destination, source);
 }

@@ -8,13 +8,13 @@ struct farray *farray_new(size_t isize)
 	struct farray *self = malloc(sizeof(struct farray));
 	if (!self) {
 		fputs("Error: Could not malloc for farray init", stderr);
-		exit(-1);
+		exit(1);
 	}
 
 	self->buf = malloc(isize * FARRAY_DEFAULT_CAP);
 	if (!self->buf) {
 		fputs("Error: Could not malloc farray buffer", stderr);
-		exit(-1);
+		exit(1);
 	}
 
 	self->size = 0;
@@ -56,7 +56,7 @@ void farray_resize(struct farray *self, size_t cap)
 	void *tmp = realloc(self->buf, cap);
 	if (!tmp) {
 		fputs("Error: Could not realloc farray buffer", stderr);
-		exit(-1);
+		exit(1);
 	}
 
 	self->buf = tmp;

@@ -47,7 +47,7 @@ void halt(const char *message);
 		if (!(expression)) { \
 			fprintf(stderr, "%s:%s:%s: Assertion failure: '"#expression "'\n", \
 				__FILE__, __func__, STRINGIFY(__LINE__)); \
-			exit(-1); \
+			exit(1); \
 		} \
 	} while (0)
 

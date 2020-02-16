@@ -16,7 +16,7 @@ struct fmap *fmap_new_rsrv(size_t isize, size_t cap)
 	struct fmap *self = malloc(sizeof(struct fmap));
 	if (!self) {
 		fputs("Error: Could not malloc fmap init", stderr);
-		exit(-1);
+		exit(1);
 	}
 
 	self->vals = calloc(cap, isize);
@@ -76,7 +76,7 @@ void fmap_grow(struct fmap *self, int mod)
 {
 	if (mod < 1) {
 		fputs("Error: Tried to grow fmap by 0 or less", stderr);
-		exit(-1);
+		exit(1);
 	}
 
 	/* swap data */
@@ -88,12 +88,12 @@ void fmap_grow(struct fmap *self, int mod)
 	self->vals = calloc(self->cap, self->isize);
 	if (!self->vals) {
 		fputs("Error: Could not calloc values in fmap resize", stderr);
-		exit(-1);
+		exit(1);
 	}
 	self->keys = calloc(self->cap, sizeof(char *));
 	if (!self->keys) {
 		fputs("Error: Could not calloc keys in fmap resize", stderr);
-		exit(-1);
+		exit(1);
 	}
 
 	size_t i, j, index;

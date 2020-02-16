@@ -29,7 +29,7 @@ void *copy(void *buf, size_t size)
 	char *new = calloc(size, sizeof(char));
 	if (!new) {
 		fputs("Error: Failed to malloc in copy", stderr);
-		exit(-1);
+		exit(1);
 	}
 	size_t i;
 	for (i = 0; i < size; i++)

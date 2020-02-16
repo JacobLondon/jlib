@@ -8,13 +8,13 @@ struct parray *parray_new(void (* free_fn)(void *buf))
 	struct parray *self = malloc(sizeof(struct parray));
 	if (!self) {
 		fputs("Error: Could not malloc for array init", stderr);
-		exit(-1);
+		exit(1);
 	}
 
 	self->buf = malloc(sizeof(void *) * PARRAY_DEFAULT_CAP);
 	if (!self->buf) {
 		fputs("Error: Could not malloc parray buffer", stderr);
-		exit(-1);
+		exit(1);
 	}
 
 	self->size = 0;
@@ -70,7 +70,7 @@ void parray_resize(struct parray *self, size_t cap)
 	void **tmp = realloc(self->buf, cap);
 	if (!tmp) {
 		fputs("Error: Could not realloc parray buffer", stderr);
-		exit(-1);
+		exit(1);
 	}
 
 	self->buf = tmp;
