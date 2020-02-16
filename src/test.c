@@ -134,12 +134,19 @@ static void test_io()
 	int i, j;
 
 	file_read_csv("test/test.csv", ",", (double *)mx, 3, 4);
-	for (i = 0; i < 4; i++) {
+	/*for (i = 0; i < 4; i++) {
 		for (j = 0; j < 3; j++) {
-			print("%lf, ", mx[i][j]);
+			print("%lf, ", mx[i * 4 + j]);
 		}
 		newline();
-	}
+	}*/
+
+	/*printf("%lf %lf %lf %lf\n", mx[0], mx[1], mx[2], mx[3]);
+	printf("%lf %lf %lf %lf\n", mx[4], mx[5], mx[6], mx[7]);
+	printf("%lf %lf %lf %lf\n", mx[8], mx[9], mx[10], mx[11]);*/
+	printf("%lf %lf %lf %lf\n", mx[0][0], mx[0][1], mx[0][2], mx[0][3]);
+	printf("%lf %lf %lf %lf\n", mx[1][0], mx[1][1], mx[1][2], mx[1][3]);
+	printf("%lf %lf %lf %lf\n", mx[2][0], mx[2][1], mx[2][2], mx[2][3]);
 }
 
 static void test_py()

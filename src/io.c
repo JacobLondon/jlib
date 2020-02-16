@@ -52,7 +52,7 @@ void file_append(const char *fname, const char *cstr)
 	}
 }
 
-void file_read_csv(const char *fname, const char *sep, double *mx, size_t x, size_t y)
+void file_read_csv(const char *fname, const char *sep, double *mx, size_t y, size_t x)
 {
 	char *raw = file_read(fname);
 	char *tmp;
@@ -65,7 +65,7 @@ void file_read_csv(const char *fname, const char *sep, double *mx, size_t x, siz
 	
 	for (i = 0; i < y; i++) {
 		for (j = 0; j < x; j++) {
-			if (sscanf(tmp, "%lf", &mx[i * y + j]) == 0) {
+			if (sscanf(tmp, "%lf", &mx[i * x + j]) == 0) {
 				goto Error;
 			}
 			
