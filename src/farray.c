@@ -1,66 +1,79 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 #include <jlib/farray.h>
 
-struct farray *farray_new(size_t isize)
+struct farray *farray_new_rsrv(size_t item_size, size_t cap)
 {
+	assert(item_size > 0);
+
 	struct farray *self = malloc(sizeof(struct farray));
 	if (!self) {
-		fputs("Error: Could not malloc for farray init", stderr);
-		exit(1);
+		return NULL;
 	}
 
-	self->buf = malloc(isize * FARRAY_DEFAULT_CAP);
+	self->buf = malloc(item_size * cap);
 	if (!self->buf) {
-		fputs("Error: Could not malloc farray buffer", stderr);
-		exit(1);
+		free(self);
+		return NULL;
 	}
 
 	self->size = 0;
-	self->isize = isize;
-	self->cap = FARRAY_DEFAULT_CAP;
+	self->item_size = item_size;
+	self->cap = cap;
 
 	return self;
 }
 
 void farray_free(struct farray *self)
 {
-	if (!self)
-		return;
+	assert(self != NULL);
 
 	/* clear each byte and free buffer */
 	if (self->buf) {
 		size_t i;
-		for (i = 0; i < self->size * self->isize; i++)
+		for (i = 0; i < self->size * self->item_size; i++)
 			((char *)self->buf)[i] = 0;
 		free(self->buf);
 	}
 
+	self->buf = NULL;
+	self->cap = 0;
+	self->item_size = 0;
+	self->size = 0;
 	free(self);
 }
 
 void farray_pop(struct farray *self)
 {
-	if (self->size > 0)
+	assert(self != NULL);
+
+	if (self->size > 0) {
 		self->size--;
+	}
 
 	/* clear the bytes of the popped item */
 	size_t i;
-	for (i = 0; i < self->isize; i++)
-		((char *)self->buf)[self->size * self->isize + i] = 0;
+	for (i = 0; i < self->item_size; i++) {
+		((char *)self->buf)[self->size * self->item_size + i] = 0;
+	}
 }
 
-void farray_resize(struct farray *self, size_t cap)
+int farray_resize(struct farray *self, size_t cap)
 {
-	void *tmp = realloc(self->buf, cap);
+	assert(self != NULL);
+	assert(cap > 0);
+
+	void *tmp = realloc(self->buf, self->item_size * cap);
 	if (!tmp) {
-		fputs("Error: Could not realloc farray buffer", stderr);
-		exit(1);
+		return 0;
 	}
 
 	self->buf = tmp;
 	self->cap = cap;
-	if (self->size > cap)
+	if (self->size > cap) {
 		self->size = cap;
+	}
+	return 1;
 }

@@ -1,9 +1,18 @@
 TARGET=jlibtest
 CC=gcc
-CFLAGS = -std=c99 -O2 -Wall -Wextra -lm -Iinclude/ $(shell python3-config --cflags) $(shell python3-config --libs) -fPIC
+CFLAGS = -std=c99 -O2 -Wall -Wextra -lm -Iinclude/
 
-OBJ_FILES=src/arg.o src/debug.o src/farray.o src/fmap.o src/io.o \
-		  src/math.o src/parray.o src/py.o src/str.o src/timer.o src/util.o
+OBJ_FILES=\
+	src/arg.o \
+	src/debug.o \
+	src/farray.o \
+	src/fmap.o \
+	src/io.o \
+	src/math.o \
+	src/parray.o \
+	src/str.o \
+	src/timer.o \
+	src/util.o
 
 .PHONY: clean
 
