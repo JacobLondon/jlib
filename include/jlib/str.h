@@ -1,29 +1,30 @@
 #ifndef JLIB_STR_H
 #define JLIB_STR_H
 
-#include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 
 int streq(const char *str0, const char *str1);
 #ifndef strdup
-char *strdup(const char *cstr);
+char *strdup(const char *str);
 #endif /* strdup */
 
-/* \brief Use printf modifiers to cat to a string with size reallocation.
-   Implementation only accepts specifiers, using flags, widths,
-   or precisions will exit with an error.
-   \param base Only pass NULL or the string to return to
-   \return the cat'ed string 
-   
-   Usage:
-     char *new = strcatf(NULL, "%d", 100);
-       or
-     char *build = strdup("Lorem");
-     build = strcatf(build, "%s", "Ipsum");
-   Else:
-      If base is a different string than the return value,
-      then \a base will point to an invalid address (due to realloc)
-   */
+/**
+ * \brief Use printf modifiers to cat to a string with size reallocation.
+ * Implementation only accepts specifiers, using flags, widths,
+ * or precisions will exit with an error.
+ * \param base Only pass NULL or the string to return to
+ * \return the cat'ed string or NULL if alloc'ing fails
+ * 
+ * Usage:
+ *   char *new = strcatf(NULL, "%d", 100);
+ *     or
+ *   char *build = strdup("Lorem");
+ *   build = strcatf(build, "%s", "Ipsum");
+ * Else:
+ *    If base is a different string than the return value,
+ *    then \a base will point to an invalid address (due to realloc)
+ */
 char *strcatf(char *base, const char *fmt, ...);
 
 /* find the length of the string equivalent of the number */
@@ -43,7 +44,7 @@ size_t strfmtlen_e(double number); /* scientific notation, ignore shortest notat
 #define strfmtlen_g strfmtlen_e
 size_t strfmtlen_a(double number); /* hexadecimal floating point */
 
-void strcat_safe(char *destination, char *source);
+int strcat_safe(char *destination, char *source);
 
 #define _STRINGIFY(x) #x
 #define STRINGIFY(x) _STRINGIFY(x)

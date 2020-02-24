@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdio.h>
 
 #include <jlib/util.h>
 
@@ -17,22 +16,15 @@ void swap(void *x, void *y)
 	y = a;
 }
 
-void clear(void *buf, int bytes)
-{
-	int i;
-	for (i = 0; i < bytes; i++)
-		((char *)buf)[i] = 0;
-}
-
 void *copy(void *buf, size_t size)
 {
 	char *new = calloc(size, sizeof(char));
 	if (!new) {
-		fputs("Error: Failed to malloc in copy", stderr);
-		exit(1);
+		return NULL;
 	}
 	size_t i;
-	for (i = 0; i < size; i++)
+	for (i = 0; i < size; i++) {
 		new[i] = ((char *)buf)[i];
+	}
 	return (void *)new;
 }

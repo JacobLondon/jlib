@@ -30,15 +30,13 @@ static void test_arg()
 		defs.count_num = 0;
 	
 	/* print found args */
-	println("%d\t%d\t%d", defs.count_num, defs.c, defs.v);
+	printf("%d\t%d\t%d\n", defs.count_num, defs.c, defs.v);
 }
 
 static void test_debug()
 {
 	HERE(1);
-	HERE_OFF;
 	HERE(2);
-	HERE_ON;
 	HERE(3);
 
 	static_assert(10 == 10);
@@ -52,21 +50,7 @@ static void test_farray()
 	for (i = 0; i < 100000; i++) {
 		farray_push(a, 10, int);
 	}
-#if 0
-	farray_push(a, 11, int);
-	farray_push(a, 12, int);
 
-	println("%d", farray_read(a, 0, int));
-	println("%d", farray_read(a, 1, int));
-	println("%d", farray_read(a, 2, int));
-
-	farray_write(a, 2, 10, int);
-	println("%d", farray_read(a, 2, int));
-	farray_pop(a);
-	/* will clear the last item with zeros */
-	println("%d", farray_read(a, 2, int));
-	farray_resize(a, 50);
-#endif
 	farray_free(a);
 }
 
@@ -79,15 +63,15 @@ static void test_parray()
 	parray_push(a, b);
 	parray_push(a, c);
 	parray_push(a, d);
-	println("%d", parray_read(a, 0, int));
-	println("%d", parray_read(a, 1, int));
-	println("%d", parray_read(a, 2, int));
+	printf("%d\n", parray_read(a, 0, int));
+	printf("%d\n", parray_read(a, 1, int));
+	printf("%d\n", parray_read(a, 2, int));
 	parray_write(a, 2, b);
-	println("%d", parray_read(a, 2, int));
+	printf("%d\n", parray_read(a, 2, int));
 	parray_pop(a);
 	/* will segfault, index 2 was just NULL'ed */
-	/* println("%d", parray_read(a, 2, int)); */
-	println("%d", parray_read(a, 1, int));
+	/* printf("%d\n", parray_read(a, 2, int)); */
+	printf("%d\n", parray_read(a, 1, int));
 	parray_resize(a, 50);
 	parray_free(a);
 }
@@ -103,24 +87,24 @@ static void test_fmap()
 		fmap_write(m, buf, 10, int);
 	}
 	
-	char *key;
-	int value;
+	volatile char *key;
+	volatile int value;
 	fmap_for_each(m, key, value, int, {
-		printf("%s: %d\n", key, value);
+		(void)key;
+		(void)value;
 	});
 
-#if 0
 	fmap_write(m, "a", 10, int);
 	fmap_write(m, "b", 11, int);
 	fmap_write(m, "c", 12, int);
-	println("%d", fmap_read(m, "a", int));
-	println("%d", fmap_read(m, "b", int));
-	println("%d", fmap_read(m, "c", int));
+	printf("%d\n", fmap_read(m, "a", int));
+	printf("%d\n", fmap_read(m, "b", int));
+	printf("%d\n", fmap_read(m, "c", int));
 	/* will print 0, as it's empty */
-	println("%d", fmap_read(m, "d", int));
+	printf("%d\n", fmap_read(m, "d", int));
 
-	println("'a' in map? %d", fmap_check(m, "a"));
-	println("'d' in map? %d", fmap_check(m, "d"));
+	printf("'a' in map? %d\n", fmap_check(m, "a"));
+	printf("'d' in map? %d\n", fmap_check(m, "d"));
 
 	fmap_write(m, "c", 12, int);
 	fmap_write(m, "d", 12, int);
@@ -131,22 +115,18 @@ static void test_fmap()
 	fmap_write(m, "i", 12, int);
 	fmap_write(m, "j", 12, int);
 	
-	newline();
-	println("Resizing...\nold cap: %ld", m->cap);
-	fmap_grow_to(m, 100);
-	println("new cap: %ld", m->cap);
-	println("'a' still in map? %d", fmap_check(m, "a"));
-	puts("Removing A...");
+	printf("\n");
+	printf("'a' still in map? %d\n", fmap_check(m, "a"));
+	printf("Removing A...\n");
 	fmap_remove(m, "a");
-	println("'a' still in map? %d", fmap_check(m, "a"));
+	printf("'a' still in map? %d\n", fmap_check(m, "a"));
 
-	puts("Removing 'z' (not in)");
+	printf("Clearing 'z' (not in)\n");
 	fmap_remove(m, "z");
 
-#endif
-	puts("Freeing...");
+	printf("Freeing...\n");
 	fmap_free(m);
-	puts("Success!");
+	printf("Success!\n");
 }
 
 static void test_io()
@@ -164,7 +144,7 @@ static void test_py()
 #if 0
 	int x[5] = {0, 1, 2, 3, 4};
 	char *py_x = python_iatoa("x", x, 5);
-	println("%s", py_x);
+	printf("%s\n", py_x);
 
 	python_init();
 	/*python_run("from time import time,ctime\n"
@@ -183,33 +163,33 @@ static void test_py()
 
 static void test_str()
 {
-	uassert(strfmtlen_d(INT_MAX) == 10);
-	uassert(strfmtlen_d(0) == 1);
-	uassert(strfmtlen_d(INT_MIN) == 11);
-	uassert(strfmtlen_u(0xFFFFFFFFFFFFFFFFULL) == 20);
-	uassert(strfmtlen_u(0) == 1);
-	uassert(strfmtlen_o(0xFFFFFFFFULL) == 11);
-	uassert(strfmtlen_o(0) == 1);
-	uassert(strfmtlen_x(0xFFFFFFFFFFFFFFFFULL) == 16);
-	uassert(strfmtlen_x(0) == 1);
+	assert(strfmtlen_d(INT_MAX) == 10);
+	assert(strfmtlen_d(0) == 1);
+	assert(strfmtlen_d(INT_MIN) == 11);
+	assert(strfmtlen_u(0xFFFFFFFFFFFFFFFFULL) == 20);
+	assert(strfmtlen_u(0) == 1);
+	assert(strfmtlen_o(0xFFFFFFFFULL) == 11);
+	assert(strfmtlen_o(0) == 1);
+	assert(strfmtlen_x(0xFFFFFFFFFFFFFFFFULL) == 16);
+	assert(strfmtlen_x(0) == 1);
 
-	uassert(strfmtlen_f(FLT_MAX) == 46);
-	uassert(strfmtlen_f(10.0f) == 9);
-	uassert(strfmtlen_lf(DBL_MAX) == 316);
-	uassert(strfmtlen_lf(1e10) == 18);
+	assert(strfmtlen_f(FLT_MAX) == 46);
+	assert(strfmtlen_f(10.0f) == 9);
+	assert(strfmtlen_lf(DBL_MAX) == 316);
+	assert(strfmtlen_lf(1e10) == 18);
 
-	uassert(strfmtlen_e(10.0) == 12);
-	uassert(strfmtlen_e(-FLT_MAX) == 13);
-	uassert(strfmtlen_e(DBL_MAX) == 13);
-	uassert(strfmtlen_e(0.0) == 12);
-	uassert(strfmtlen_a(DBL_MAX) == 23);
+	assert(strfmtlen_e(10.0) == 12);
+	assert(strfmtlen_e(-FLT_MAX) == 13);
+	assert(strfmtlen_e(DBL_MAX) == 13);
+	assert(strfmtlen_e(0.0) == 12);
+	assert(strfmtlen_a(DBL_MAX) == 23);
 
 	char *lit = strdup("1234567890");
-	print("literal = %s\n", lit);
+	printf("literal = %s\n", lit);
 
 	char *build = strcatf(NULL, "%d %lf %s", 1, 177.2, "tester");
 	build = strcatf(build, " %llu", 10000ULL);
-	println("%s", build);
+	printf("%s\n", build);
 	
 	free(build);
 }
@@ -221,11 +201,10 @@ static void test_timer()
 
 	timer_rst();
 	for (i = 0; i < 50000UL; i++)
-		print("%lu\r", i);
+		printf("%lu\r", i);
 	dur = timer_lap();
 	
-	newline();
-	println("Duration: %lf", dur);
+	printf("Duration: %lf\n", dur);
 }
 
 int main(int argc, char **argv)

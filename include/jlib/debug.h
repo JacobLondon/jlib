@@ -2,10 +2,7 @@
 #define JLIB_DEBUG_H
 
 #include <stdio.h>
-
-extern int _InternalHerePass;
-#define HERE_OFF _InternalHerePass = 0
-#define HERE_ON _InternalHerePass = 1
+#include <assert.h>
 
 #ifndef _STRINGIFY
 	#define _STRINGIFY(x) #x
@@ -15,8 +12,7 @@ extern int _InternalHerePass;
 #endif /* STRINGIFY */
 
 #define HERE(num) \
-	if (_InternalHerePass) \
-		fprintf(stderr, "%s:%s:%s: Here %d\n", __FILE__, __func__, STRINGIFY(__LINE__), num)
+	fprintf(stderr, "%s:%s:%s: Here %d\n", __FILE__, __func__, STRINGIFY(__LINE__), num)
 
 void halt(const char *message);
 
@@ -42,13 +38,19 @@ void halt(const char *message);
 	#endif /* NDEBUG */
 #endif
 
-#define uassert(expression) \
-	do { \
-		if (!(expression)) { \
-			fprintf(stderr, "%s:%s:%s: Assertion failure: '"#expression "'\n", \
-				__FILE__, __func__, STRINGIFY(__LINE__)); \
-			exit(1); \
-		} \
-	} while (0)
+#if !defined(assert)
+	#ifdef NDEBUG
+		#define assert(cond) ((void)0)
+	#else
+		#define assert(cond) \
+			do { \
+				if (!(expression)) { \
+					fprintf(stderr, "%s:%s:%s: Assertion failure: '"#cond "'\n", \
+						__FILE__, __func__, STRINGIFY(__LINE__)); \
+					exit(1); \
+				} \
+			} while (0)
+	#endif /* NDEBUG */
+#endif
 
 #endif /* JLIB_DEBUG_H */

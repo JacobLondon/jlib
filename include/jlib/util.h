@@ -12,7 +12,6 @@
 
 void xswap(void *x, void *y);
 void swap(void *x, void *y);
-void clear(void *a, int bytes);
 void *copy(void *buf, size_t size);
 
 #endif /* JLIB_UTIL_H */

@@ -1,7 +1,7 @@
 #ifndef JLIB_FMAP_H
 #define JLIB_FMAP_H
 
-#include <stddef.h> /* size_t */
+#include <stdlib.h> /* size_t */
 #include <string.h>
 
 #define FMAP_DEFAULT_CAP 8
@@ -50,13 +50,6 @@ int fmap_check(struct fmap *self, const char *key);
  * Return 1 if success, else 0
  */
 int fmap_grow_by(struct fmap *self, int mod);
-
-/**
- * Grow capacity to Cap, may be slightly off based on integer division
- * 
- * Return 1 if success, else 0
- */
-#define fmap_grow_to(Mapptr, Cap) fmap_grow((Mapptr), (Cap) / (Mapptr)->cap)
 
 /**
  * Clear the item and key based on the given key

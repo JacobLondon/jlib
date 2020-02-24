@@ -1,7 +1,7 @@
 #include <stdarg.h>
+#include <stdlib.h>
 #include <stdio.h>
-#include <stdint.h>
-#include <math.h>
+//#include <math.h>
 
 #include <jlib/str.h>
 
@@ -20,11 +20,11 @@ static void clear_fmt_buf()
 	}
 }
 
-int streq(const char *cstr0, const char *cstr1)
+int streq(const char *str0, const char *str1)
 {
 	size_t i;
-	for (i = 0; cstr0[i] || cstr1[i]; i++) {
-		if (cstr0[i] != cstr1[i])
+	for (i = 0; str0[i] || str1[i]; i++) {
+		if (str0[i] != str1[i])
 			return 0;
 	}
 	return 1;
@@ -35,8 +35,7 @@ char *strdup(const char *cstr)
 {
 	char *build = calloc(strlen(cstr) + 1, sizeof(char));
 	if (!build) {
-		fputs("Error: Could not calloc in strnew\n", stderr);
-		exit(1);
+		return NULL;
 	}
 	size_t i;
 	for (i = 0; (build[i] = cstr[i]); i++)
@@ -175,20 +174,24 @@ char *strcatf(char *dest, const char *fmt, ...)
 				goto Error;
 			}
 			i++;
-		} else /* end if('%'), is a regular character */
+		}
+		/* end if('%'), current character is a regular one */
+		else {
 			bytes++;
+		}
 	}
 	bytes++;
 	va_end(arglist);
 
-	if (dest)
+	if (dest) {
 		tmp = (char *)realloc(dest, bytes);
-	else
+	}
+	else {
 		tmp = (char *)calloc(bytes, sizeof(char));
+	}
 
 	if (!tmp) {
-		fputs("Error: Could not realloc in strcatf", stderr);
-		exit(1);
+		return NULL;
 	}
 	dest = tmp;
 
@@ -202,8 +205,10 @@ char *strcatf(char *dest, const char *fmt, ...)
 
 	return dest;
 Error:
-	fputs("Error: Invalid strcatf format specifier", stderr);
-	exit(1);
+#ifndef NDEBUG
+	fprintf(stderr, "Invalid format specifier\n");
+#endif
+	return NULL;
 }
 
 size_t strfmtlen_d(long long number)
@@ -280,12 +285,12 @@ STRFMTLEN_X(lf, double)
 STRFMTLEN_X(e, double)
 STRFMTLEN_X(a, double)
 
-void strcat_safe(char *destination, char *source)
+int strcat_safe(char *destination, char *source)
 {
 	void *tmp = realloc(destination, strlen(destination) + strlen(source) + 1);
 	if (!tmp) {
-		fputs("Error: Could not realloc in strcat_safe", stderr);
-		exit(1);
+		return 0;
 	}
-	strcat(destination, source);
+	(void)strcat(destination, source);
+	return 1;
 }
