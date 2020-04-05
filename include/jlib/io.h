@@ -3,8 +3,9 @@
 
 /**
  * Read a file into an allocated string
+ * Size out variable from read file length
  */
-char *file_read(const char *fname);
+char *file_read(const char *fname, size_t *size);
 
 /**
  * Overwrite all data in a file with a string

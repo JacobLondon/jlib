@@ -1,62 +1,45 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
-//#include <math.h>
+#include <ctype.h>
 
 #include <jlib/str.h>
 
-enum { BUF_LEN = 512 }; /* DBL_MAX's length = 316 characters, go to 512 for good measure */
-
-static char _InternalFmtBuf[BUF_LEN];
-static void clear_fmt_buf()
+/* DBL_MAX's length = 316 characters, go to 512 for good measure */
+enum { STRCATF_BUFSIZ = 512 };
+static char strcatf_buf[STRCATF_BUFSIZ];
+static void strcatf_clear_buf()
 {
 	int i = 0;
-	for (; i < BUF_LEN; i++) {
+	for (; i < STRCATF_BUFSIZ; i++) {
 		/* unlikely */
-		if (__builtin_expect(_InternalFmtBuf[i] == 0, 0))
+		if (__builtin_expect(strcatf_buf[i] == 0, 0)) {
 			break;
-		else
-			_InternalFmtBuf[i] = 0;
+		}
+		else {
+			strcatf_buf[i] = 0;
+		}
 	}
 }
-
-int streq(const char *str0, const char *str1)
-{
-	size_t i;
-	for (i = 0; str0[i] || str1[i]; i++) {
-		if (str0[i] != str1[i])
-			return 0;
-	}
-	return 1;
-}
-
-#ifndef strdup
-char *strdup(const char *cstr)
-{
-	char *build = calloc(strlen(cstr) + 1, sizeof(char));
-	if (!build) {
-		return NULL;
-	}
-	size_t i;
-	for (i = 0; (build[i] = cstr[i]); i++)
-		;
-	
-	return build;
-}
-#endif /* strdup */
 
 char *strcatf(char *dest, const char *fmt, ...)
 {
+	if (!fmt) {
+		return NULL;
+	}
+
 	size_t destlen;
 	size_t fmtlen = strlen(fmt);
 	va_list arglist;
 	va_start(arglist, fmt);
 
 	/* allow for NULL dest, create a new string */
-	if (dest)
+	if (dest) {
 		destlen = strlen(dest);
-	else
+	}
+	else {
 		destlen = 0;
+	}
 
 	/* record the number of bytes needed to hold the formatted string */
 	size_t i, bytes;
@@ -205,9 +188,6 @@ char *strcatf(char *dest, const char *fmt, ...)
 
 	return dest;
 Error:
-#ifndef NDEBUG
-	fprintf(stderr, "Invalid format specifier\n");
-#endif
 	return NULL;
 }
 
@@ -272,18 +252,33 @@ size_t strfmtlen_x(unsigned long long number)
 	return count; /* 0x omitted */
 }
 
-#define STRFMTLEN_X(Specifier, Type) \
-	size_t strfmtlen_##Specifier(Type number) \
-	{ \
-		clear_fmt_buf(); \
-		snprintf(_InternalFmtBuf, BUF_LEN, "%" #Specifier, number); \
-		return strlen(_InternalFmtBuf); \
-	}
+size_t strfmtlen_f(float number)
+{
+	strcatf_clear_buf();
+	snprintf(strcatf_buf, STRCATF_BUFSIZ, "%f", number);
+	return strlen(strcatf_buf);
+}
 
-STRFMTLEN_X(f, float)
-STRFMTLEN_X(lf, double)
-STRFMTLEN_X(e, double)
-STRFMTLEN_X(a, double)
+size_t strfmtlen_lf(double number)
+{
+	strcatf_clear_buf();
+	snprintf(strcatf_buf, STRCATF_BUFSIZ, "%lf", number);
+	return strlen(strcatf_buf);
+}
+
+size_t strfmtlen_e(double number)
+{
+	strcatf_clear_buf();
+	snprintf(strcatf_buf, STRCATF_BUFSIZ, "%e", number);
+	return strlen(strcatf_buf);
+}
+
+size_t strfmtlen_a(double number)
+{
+	strcatf_clear_buf();
+	snprintf(strcatf_buf, STRCATF_BUFSIZ, "%a", number);
+	return strlen(strcatf_buf);
+}
 
 int strcat_safe(char *destination, char *source)
 {
@@ -293,4 +288,104 @@ int strcat_safe(char *destination, char *source)
 	}
 	(void)strcat(destination, source);
 	return 1;
+}
+
+int streq(const char *str0, const char *str1)
+{
+	size_t i;
+	for (i = 0; str0[i] || str1[i]; i++) {
+		if (str0[i] != str1[i])
+			return 0;
+	}
+	return 1;
+}
+
+#ifndef strdup
+char *strdup(const char *str)
+{
+	size_t i;
+	char *buf = calloc(strlen(str) + 1, sizeof(char));
+	if (!buf) {
+		return NULL;
+	}
+	for (i = 0; (buf[i] = str[i]); i++)
+		;
+	
+	return buf;
+}
+#endif /* strdup */
+
+char *strndup(const char *str, size_t n)
+{
+	size_t i;
+	size_t size = strlen(str);
+	size = size > n ? n : size;
+	char *buf = calloc(size + 1, sizeof(char));
+	if (!buf) {
+		return NULL;
+	}
+	for (i = 0; i < size; i++) {
+		buf[i] = str[i];
+	}
+	return buf;
+}
+
+char **strsplit(char *s, const char *fmt)
+{
+	if (!s || !fmt) {
+		return NULL;
+	}
+
+	size_t word_count = 0;
+	size_t size = strlen(s);
+	char **buf;
+	char *tmp;
+	size_t i, j;
+
+	/* count words */
+	for (i = 0; i < size - 1; i++) {
+		/* skip any invalid characters */
+		if (strchr(fmt, s[i])) {
+			continue;
+		}
+
+		/* word was found, traverse passed it */
+		for (; !strchr(fmt, s[i]) && s[i]; i++)
+			;
+		word_count++;
+	}
+
+	/* hold each string and NULL terminate */
+	buf = calloc(word_count + 1, sizeof(char *));
+	if (!buf) {
+		return NULL;
+	}
+
+	/* dup each string */
+	for (i = 0, j = 0; i < word_count; i++) {
+		/* probe forward for length */
+		for (; j < size; j++) {
+			if (strchr(fmt, s[j])) {
+				continue;
+			}
+			
+			/* word was found, traverse passed it */
+			for (tmp = &s[j]; !strchr(fmt, s[j]) && s[j]; j++)
+				;
+
+			/* buf[i] might be NULL, no guarantees */
+			buf[i] = strndup(tmp, (size_t)(&s[j] - tmp));
+			break;
+		}
+	}
+	return buf;
+}
+
+void strsplit_free(char **buf)
+{
+	size_t i = 0;
+	for (; buf[i]; i++) {
+		free(buf[i]);
+	}
+	free(buf);
 }

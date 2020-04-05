@@ -192,6 +192,24 @@ static void test_str()
 	printf("%s\n", build);
 	
 	free(build);
+
+	char *s = strndup("0123456789", 3);
+	printf("%s\n", s);
+	free(s);
+
+	char *words = "Hello, how is your day today? I'm hoping you are doing well!";
+	char **split = strsplit(words, " ,?!");
+	size_t i;
+
+	printf("Words: %s\n", words);
+	printf("Split: ");
+	
+	for (i = 0; split[i]; i++) {
+		printf("%s ", split[i]);
+	}
+	printf("\n");
+
+	strsplit_free(split);
 }
 
 static void test_timer()

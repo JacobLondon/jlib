@@ -4,51 +4,61 @@
 
 #include <jlib/io.h>
 
-char *file_read(const char *fname)
+char *file_read(const char *fname, size_t *size)
 {
-	char *buf = NULL;
-	long length;
-	FILE *f = fopen(fname, "rb");
-
-	if (f) {
-		fseek(f, 0, SEEK_END);
-		length = ftell(f);
-		fseek(f, 0, SEEK_SET);
-		buf = malloc(length);
-		if (buf) {
-			(void)fread(buf, 1, length, f);
-		}
-		fclose(f);
-	}
-	else {
+	if (!fname) {
 		return NULL;
 	}
+
+	char *buf;
+	size_t bytes;
+	long length;
+
+	FILE *f = fopen(fname, "rb");
+	if (!f) {
+		if (size) {
+			*size = 0;
+		}
+		return NULL;
+	}
+
+	fseek(f, 0, SEEK_END);
+	length = ftell(f);
+	fseek(f, 0, SEEK_SET);
+
+	buf = malloc(length + 1);
+	if (buf) {
+		bytes = fread(buf, 1, length, f);
+		buf[bytes] = '\0';
+		if (size) {
+			*size = bytes;
+		}
+	}
+	fclose(f);
 	return buf;
 }
 
 int file_write(const char *fname, const char *str)
 {
 	FILE *f = fopen(fname, "wb");
-	if (f) {
-		fputs(str, f);
-		fclose(f);
-	}
-	else {
+	if (!f) {
 		return 0;
 	}
+
+	fputs(str, f);
+	fclose(f);
 	return 1;
 }
 
 int file_append(const char *fname, const char *str)
 {
 	FILE *f = fopen(fname, "ab");
-	if (f) {
-		fputs(str, f);
-		fclose(f);
-	}
-	else {
+	if (!f) {
 		return 0;
 	}
+
+	fputs(str, f);
+	fclose(f);
 	return 1;
 }
 
@@ -56,7 +66,7 @@ int file_read_csv(const char *fname, const char *sep, double *mx, size_t y, size
 {
 	char *tmp;
 	size_t i, j;
-	char *raw = file_read(fname);
+	char *raw = file_read(fname, NULL);
 	
 	if (!raw) {
 		return 0;
