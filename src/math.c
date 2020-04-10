@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include <jlib/math.h>
 #include <jlib/util.h>
 
@@ -27,6 +29,16 @@ float fast_invsqrtf(float number)
 	conv.i = 0x5f3759df - (conv.i >> 1);
 	conv.f *= (threehalfs - (x2 * conv.f * conv.f ));
 	return conv.f;
+}
+
+int rand_range(int min, int max)
+{
+	return rand() % (max - min) + min;
+}
+
+float rand_uniform(void)
+{
+	return (float)rand() / (float)RAND_MAX;
 }
 
 /**
@@ -93,4 +105,43 @@ unsigned long lcm(unsigned long a, unsigned long b)
 		return (a / gcd(a, b)) * b;
 	else
 		return 0;
+}
+
+double fast_sin(double x) {
+	int k;
+	double y;
+	double z;
+	union {
+		double f;
+		int i;
+	} s;
+
+	z = x;
+	z *= 0.3183098861837907;
+	z += 6755399441055744.0;
+	s.f = z;
+	k = s.i;
+	z = k;
+	z *= 3.1415926535897932;
+	x -= z;
+	y = x;
+	y *= x;
+	z = 0.0073524681968701;
+	z *= y;
+	z -= 0.1652891139701474;
+	z *= y;
+	z += 0.9996919862959676;
+	x *= z;
+	k &= 1;
+	k += k;
+	z = k;
+	z *= x;
+	x -= z;
+
+	return x;
+}
+
+double fast_cos(double x)
+{
+	return fast_sin(x + 3.14159265358979323846 / 2.0);
 }

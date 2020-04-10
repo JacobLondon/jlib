@@ -2,7 +2,7 @@
 #include <limits.h>
 #include <jlib/jlib.h>
 
-static void test_arg()
+static void test_arg(void)
 {
 	int argc = 4;
 	char *argv[4] = {
@@ -33,17 +33,40 @@ static void test_arg()
 	printf("%d\t%d\t%d\n", defs.count_num, defs.c, defs.v);
 }
 
-static void test_debug()
+static void test_debug(void)
 {
 	HERE(1);
 	HERE(2);
 	HERE(3);
 
-	static_assert(10 == 10);
+	static_assert(10 == 10, "Must be valid");
 	halt("Static assert successful");
 }
 
-static void test_farray()
+static void test_gc(void)
+{
+	size_t i;
+	struct gc *gc = gc_new();
+
+	for (i = 0; i < 500; i++) {
+		gc_alloc(gc, sizeof(int));
+	}
+	printf("Size 1: %zu\n", gc->size);
+	gc_mark(gc);
+
+	for (i = 0; i < 500; i++) {
+		gc_alloc(gc, sizeof(int));
+	}
+	printf("Size 2: %zu\n", gc->size);
+
+	gc_collect(gc);
+	printf("Size 3: %zu\n", gc->size);
+	gc_collect(gc);
+	printf("Size 4: %zu\n", gc->size);
+	gc_free(gc);
+}
+
+static void test_farray(void)
 {
 	struct farray *a = farray_new(sizeof(int));
 	size_t i;
@@ -54,7 +77,7 @@ static void test_farray()
 	farray_free(a);
 }
 
-static void test_parray()
+static void test_parray(void)
 {
 	struct parray *a = parray_new(NULL);
 	int b = 10;
@@ -76,7 +99,7 @@ static void test_parray()
 	parray_free(a);
 }
 
-static void test_fmap()
+static void test_fmap(void)
 {
 	struct fmap *m = fmap_new(sizeof(int));
 	char buf[32] = {0};
@@ -129,7 +152,7 @@ static void test_fmap()
 	printf("Success!\n");
 }
 
-static void test_io()
+static void test_io(void)
 {
 	double mx[3][4] = {0};
 
@@ -139,7 +162,7 @@ static void test_io()
 	printf("%lf %lf %lf %lf\n", mx[2][0], mx[2][1], mx[2][2], mx[2][3]);
 }
 
-static void test_py()
+static void test_py(void)
 {
 #if 0
 	int x[5] = {0, 1, 2, 3, 4};
@@ -161,7 +184,7 @@ static void test_py()
 #endif
 }
 
-static void test_str()
+static void test_str(void)
 {
 	assert(strfmtlen_d(INT_MAX) == 10);
 	assert(strfmtlen_d(0) == 1);
@@ -212,7 +235,7 @@ static void test_str()
 	strsplit_free(split);
 }
 
-static void test_timer()
+static void test_timer(void)
 {
 	unsigned long i;
 	double dur;
@@ -233,6 +256,8 @@ int main(int argc, char **argv)
 		test_debug();
 	else if (arg_check(argc, argv, "--farray"))
 		test_farray();
+	else if (arg_check(argc, argv, "--gc"))
+		test_gc();
 	else if (arg_check(argc, argv, "--parray"))
 		test_parray();
 	else if (arg_check(argc, argv, "--fmap"))

@@ -8,6 +8,8 @@
 
 static size_t hash_fnv1a(const char *buf, size_t bias, size_t max)
 {
+	assert(buf);
+
 	size_t hash = HASH_FNV1A_SEED + bias;
 	while (*buf) {
 		hash = (*buf++ ^ hash) * HASH_FNV1A_PRIME;
@@ -18,12 +20,12 @@ static size_t hash_fnv1a(const char *buf, size_t bias, size_t max)
 struct fmap *fmap_new_rsrv(size_t item_size, size_t cap)
 {
 	struct fmap *self = malloc(sizeof(struct fmap));
-	if (!self) {
-		return NULL;
-	}
+	assert(self);
 
 	self->vals = calloc(cap, item_size);
+	assert(self->vals);
 	self->keys = calloc(cap, sizeof(char *));
+	assert(self->keys);
 	self->cap = FMAP_DEFAULT_CAP;
 	self->item_size = item_size;
 
@@ -32,7 +34,7 @@ struct fmap *fmap_new_rsrv(size_t item_size, size_t cap)
 
 void fmap_free(struct fmap *self)
 {
-	assert(self != NULL);
+	assert(self);
 
 	/* clear each byte and free */
 	if (self->vals) {
@@ -62,6 +64,8 @@ void fmap_free(struct fmap *self)
 
 size_t fmap_biased_index(struct fmap* self, const char *key)
 {
+	assert(self);
+
 	size_t index;
 	size_t bias = 0;
 	do {
@@ -74,13 +78,14 @@ size_t fmap_biased_index(struct fmap* self, const char *key)
 
 int fmap_check(struct fmap *self, const char *key)
 {
+	assert(self);
 	size_t index = fmap_biased_index(self, key);
 	return self->keys[index] ? 1 : 0;
 }
 
 int fmap_grow_by(struct fmap *self, int mod)
 {
-	assert(self != NULL);
+	assert(self);
 	assert(mod >= 1);
 
 	/* swap data */
@@ -125,8 +130,8 @@ int fmap_grow_by(struct fmap *self, int mod)
 
 void fmap_remove(struct fmap *self, const char *key)
 {
-	assert(self != NULL);
-	assert(key != NULL);
+	assert(self);
+	assert(key);
 
 	size_t index = fmap_biased_index(self, key);
 	size_t i;

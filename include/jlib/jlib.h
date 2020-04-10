@@ -5,7 +5,7 @@
 #include "debug.h"
 #include "farray.h"
 #include "fmap.h"
-#include "generic.h"
+#include "gc.h"
 #include "io.h"
 #include "math.h"
 #include "parray.h"

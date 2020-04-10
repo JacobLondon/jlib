@@ -8,15 +8,10 @@ struct farray *farray_new_rsrv(size_t item_size, size_t cap)
 	assert(item_size > 0);
 
 	struct farray *self = malloc(sizeof(struct farray));
-	if (!self) {
-		return NULL;
-	}
+	assert(self);
 
 	self->buf = malloc(item_size * cap);
-	if (!self->buf) {
-		free(self);
-		return NULL;
-	}
+	assert(self);
 
 	self->size = 0;
 	self->item_size = item_size;
@@ -59,20 +54,17 @@ void farray_pop(struct farray *self)
 	}
 }
 
-int farray_resize(struct farray *self, size_t cap)
+void farray_resize(struct farray *self, size_t cap)
 {
 	assert(self != NULL);
 	assert(cap > 0);
 
 	void *tmp = realloc(self->buf, self->item_size * cap);
-	if (!tmp) {
-		return 0;
-	}
+	assert(tmp);
 
 	self->buf = tmp;
 	self->cap = cap;
 	if (self->size > cap) {
 		self->size = cap;
 	}
-	return 1;
 }

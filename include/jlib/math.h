@@ -9,9 +9,15 @@
 float fast_sqrtf(float number);
 float fast_invsqrtf(float number);
 
+int rand_range(int min, int max);
+float rand_uniform(void);
+
 /* Linux kernel functions */
 unsigned long long int_pow(unsigned long long base, unsigned int exp);
 unsigned long gcd(unsigned long a, unsigned long b);
 unsigned long lcm(unsigned long a, unsigned long b);
+
+double fast_sin(double x);
+double fast_cos(double x);
 
 #endif

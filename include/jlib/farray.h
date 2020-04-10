@@ -37,7 +37,7 @@ void farray_pop(struct farray *self);
 /**
  * Change the maximum capacity of an farray
  */
-int farray_resize(struct farray *self, size_t cap);
+void farray_resize(struct farray *self, size_t cap);
 
 /**
  * Write the Value at the end of the farray
@@ -45,8 +45,7 @@ int farray_resize(struct farray *self, size_t cap);
 #define farray_push(Arrayptr, Value, Type) \
 	do { \
 		if ((Arrayptr)->size == (Arrayptr)->cap) { \
-			(Arrayptr)->cap = (Arrayptr)->cap * FARRAY_DEFAULT_SCALING; \
-			farray_resize((Arrayptr), (Arrayptr)->cap); \
+			farray_resize((Arrayptr), (Arrayptr)->cap * FARRAY_DEFAULT_SCALING); \
 		} \
 		((Type *)((Arrayptr)->buf))[(Arrayptr)->size++] = (Value); \
 	} while (0)

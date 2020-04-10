@@ -26,13 +26,13 @@ void halt(const char *message);
 
 #if !defined(static_assert)
 	#ifdef NDEBUG
-		#define static_assert(cond) ((void)0)
+		#define static_assert(cond, stmt) ((void)0)
 	#else
-		#define static_assert_expr(cond) \
-			(sizeof(char [1 - 2*!(cond)]) - 1)
+		#define static_assert_expr(cond, stmt) \
+			((void)stmt), (sizeof(char [1 - 2*!(cond)]) - 1)
 
-		#define static_assert(cond) do { \
-				(void)static_assert_expr(cond); \
+		#define static_assert(cond, stmt) do { \
+				(void)static_assert_expr(cond, stmt); \
 			} while(0)
 
 	#endif /* NDEBUG */

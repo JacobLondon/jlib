@@ -1,12 +1,13 @@
 TARGET=jlibtest
 CC=gcc
-CFLAGS = -std=c99 -O2 -Wall -Wextra -lm -Iinclude/
+CFLAGS = -std=c11 -O2 -Wall -Wextra -lm -Iinclude/
 
 OBJ_FILES=\
 	src/arg.o \
 	src/debug.o \
 	src/farray.o \
 	src/fmap.o \
+	src/gc.o \
 	src/io.o \
 	src/math.o \
 	src/parray.o \

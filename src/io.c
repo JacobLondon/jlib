@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -15,25 +16,21 @@ char *file_read(const char *fname, size_t *size)
 	long length;
 
 	FILE *f = fopen(fname, "rb");
-	if (!f) {
-		if (size) {
-			*size = 0;
-		}
-		return NULL;
-	}
+	assert(f);
 
 	fseek(f, 0, SEEK_END);
 	length = ftell(f);
 	fseek(f, 0, SEEK_SET);
 
 	buf = malloc(length + 1);
-	if (buf) {
-		bytes = fread(buf, 1, length, f);
-		buf[bytes] = '\0';
-		if (size) {
-			*size = bytes;
-		}
+	assert(buf);
+	
+	bytes = fread(buf, 1, length, f);
+	buf[bytes] = '\0';
+	if (size) {
+		*size = bytes;
 	}
+
 	fclose(f);
 	return buf;
 }
@@ -64,6 +61,10 @@ int file_append(const char *fname, const char *str)
 
 int file_read_csv(const char *fname, const char *sep, double *mx, size_t y, size_t x)
 {
+	assert(fname);
+	assert(sep);
+	assert(mx);
+
 	char *tmp;
 	size_t i, j;
 	char *raw = file_read(fname, NULL);

@@ -18,7 +18,7 @@ struct parray {
  * Allocate an array on the heap, pass a function
  * to free each item on array_free, NULL if not needed
  */
-struct parray *parray_new(void (* free_fn)(void *buf));
+struct parray *parray_new(void (* del)(void *buf));
 
 /**
  * Free a parray and all of its members
