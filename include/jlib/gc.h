@@ -10,9 +10,9 @@ struct ref {
 };
 
 struct gc {
-	struct ref **refs; /* read-only */
-	size_t size;       /* read-only */
-	size_t cap;        /* read-only */
+	struct ref *refs; /* read-only */
+	size_t size;      /* read-only */
+	size_t cap;       /* read-only */
 };
 
 /**
@@ -28,12 +28,17 @@ void gc_free(struct gc *self);
  * 'calloc' memory and the GC owns it, the pointer is returned,
  * and the desctructor (nullable) is specified.
  */
-void *gc_alloc_dtor(struct gc *self, size_t size, void (*dtor)(void *self));
+void *gc_alloc_dtor(struct gc *self, size_t size, void (*dtor)(void *val));
 /**
  * 'calloc' memory and the GC owns it, the pointer is returned,
  * and the destructor automatically 'free'
  */
 #define gc_alloc(self, size) gc_alloc_dtor(self, size, free)
+
+/**
+ * Transfer ownership of an already allocated val to the GC
+ */
+void gc_push(struct gc *self, void *val, void (*dtor)(void *val));
 
 /**
  * Mark a point to collect to
