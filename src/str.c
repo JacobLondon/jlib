@@ -1,10 +1,211 @@
+#include <assert.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#include <wchar.h>
 #include <ctype.h>
+#include <stdint.h>
 
 #include <jlib/str.h>
 
+/**
+ * Only works with the following formats:
+ * # means explicitly unsupported
+ * 
+ * %d   %i   %u   %o   %x   %X   %e   %E   %a   %A   %f   %F   %c   %n   %s   %p   %%
+ * %ld  %li  %lu  %lo  %lx  %lX  %le  %lE  %la  %lA  %lf  %lF  #lc  %ln  %ls
+ * %lld %lli %llu %llo %llx %llX                                    %lln
+ * %zd  %zi  %zu  %zo  %zx  %zX                                     %zn
+ * %jd  %ji  %ju  %jo  %jx  %jX                                     %jn
+ * %td  %ti  %tu  %to  %tx  %tX                                     %tn
+ * 
+ */
+int strcatf(char **buffer, const char *format, ...)
+{
+	char buf[350];
+	long long int buffer_size;
+	size_t format_size = strlen(format);
+	va_list ap;
+	long long int bytes;
+	char *p, *tmp;
+
+	enum X_TYPE_INFO {
+		X_NONE = 0x00,
+		X_L    = 0x01,
+		X_LL   = 0x02,
+		X_Z    = 0x04,
+		X_J    = 0x08,
+		X_T    = 0x10
+	};
+	unsigned char type_info;
+
+	if (format == NULL || buffer == NULL) {
+		return 0;
+	}
+
+	/* allow for NULL buffer, create a new string */
+	if (*buffer != NULL) {
+		buffer_size = strlen(*buffer);
+	}
+	else {
+		buffer_size = 0;
+	}
+
+	/**
+	 * There's a critical bug here, the format size needs to decrease by
+	 * the amount of each format specifier, then increase in size by what
+	 * fills it. This needs to be seperate to buffer/format size
+	 * 
+	 */
+
+	va_start(ap, format);
+	for (p = (char *)format, bytes = buffer_size; p != format + format_size; ++p) {
+		if (*p != '%') continue;
+		if (++p == format + format_size) break;
+		
+		for (tmp = buf; tmp != buf + sizeof(buf) && *tmp != '\0'; *tmp++ = '\0');
+		type_info = X_NONE;
+		again:
+		switch (*p) {
+			case '%': // special case, just go to entirely next item
+				bytes++;
+				continue;
+			case 'l':
+				if (type_info & X_L) type_info = X_LL;
+				else type_info = X_L;
+				goto next;
+			case 'z':
+				type_info = X_Z;
+				goto next;
+			case 'j':
+				type_info = X_J;
+				goto next;
+			case 't':
+				type_info = X_T;
+			next:
+				if (++p == format + format_size) goto done;
+				goto again;
+			default:
+				break;
+		}
+
+		#define X_FORMAT(Fmt, Type) \
+			snprintf(buf, sizeof(buf), (Fmt), va_arg(ap, Type)); \
+			bytes -= (sizeof(Fmt) - 1); format_size -= (sizeof(Fmt) - 1); \
+			printf("%" Fmt " %d, subbing %zu\n", __LINE__, sizeof(Fmt) - 1); break
+		
+		switch (*p) {
+			case 'd': switch (type_info) {
+				case X_NONE: X_FORMAT(  "%d", int);
+				case X_L:    X_FORMAT( "%ld", long int);
+				case X_LL:   X_FORMAT("%lld", long long int);
+				case X_Z:    X_FORMAT( "%zd", size_t);
+				case X_J:    X_FORMAT( "%jd", intmax_t);
+				case X_T:    X_FORMAT( "%td", ptrdiff_t);
+				default:     assert(0);
+			}
+			break;
+			case 'i': switch (type_info) {
+				case X_NONE: X_FORMAT(  "%i", int);
+				case X_L:    X_FORMAT( "%li", long int);
+				case X_LL:   X_FORMAT("%lli", long long int);
+				case X_Z:    X_FORMAT( "%zi", size_t);
+				case X_J:    X_FORMAT( "%ji", intmax_t);
+				case X_T:    X_FORMAT( "%ti", ptrdiff_t);
+				default:     assert(0);
+			}
+			break;
+			case 'x': case 'X': switch (type_info) {
+				case X_NONE: X_FORMAT(  "%x", unsigned int);
+				case X_L:    X_FORMAT( "%lx", unsigned long int);
+				case X_LL:   X_FORMAT("%llx", unsigned long long int);
+				case X_Z:    X_FORMAT( "%zx", size_t);
+				case X_J:    X_FORMAT( "%jx", uintmax_t);
+				case X_T:    X_FORMAT( "%tx", ptrdiff_t);
+				default:     assert(0);
+			}
+			break;
+			case 'u': switch (type_info) {
+				case X_NONE: X_FORMAT(  "%u", unsigned int);
+				case X_L:    X_FORMAT( "%lu", unsigned long int);
+				case X_LL:   X_FORMAT("%llu", unsigned long long int);
+				case X_Z:    X_FORMAT( "%zu", size_t);
+				case X_J:    X_FORMAT( "%ju", uintmax_t);
+				case X_T:    X_FORMAT( "%tu", ptrdiff_t);
+				default:     assert(0);
+			}
+			break;
+			case 'e': case 'E': switch (type_info) {
+				case X_NONE: X_FORMAT(  "%e", double);
+				case X_L:    X_FORMAT( "%le", double);
+				default:     assert(0);
+			}
+			break;
+			case 'a': case 'A': switch (type_info) {
+				case X_NONE: X_FORMAT(  "%a", double);
+				case X_L:    X_FORMAT( "%la", double);
+				default:     assert(0);
+			}
+			case 'f': case 'F': switch (type_info) {
+				case X_NONE: X_FORMAT(  "%f", double);
+				case X_L:    X_FORMAT( "%lf", double);
+				default:     assert(0);
+			}
+			break;
+			case 'c': switch (type_info) {
+				case X_NONE: X_FORMAT(  "%c", int);
+				case X_L:    X_FORMAT( "%lc", wint_t);
+				default:     assert(0);
+			}
+			break;
+			case 'n': switch (type_info) {
+				case X_NONE: X_FORMAT(  "%n", int*);
+				case X_L:    X_FORMAT( "%ln", long int*);
+				case X_LL:   X_FORMAT("%lln", long long int*);
+				case X_Z:    X_FORMAT( "%zn", size_t*);
+				case X_J:    X_FORMAT( "%jn", intmax_t*);
+				case X_T:    X_FORMAT( "%tn", ptrdiff_t*);
+				default:     assert(0);
+			}
+			break;
+			case 's': switch (type_info) {
+				case X_NONE: X_FORMAT(  "%s", char*);
+				case X_L:    X_FORMAT( "%ls", wchar_t*);
+				default:     assert(0);
+			}
+			break;
+			case 'p': switch (type_info) {
+				case X_NONE: X_FORMAT(  "%p", void*);
+				default:     assert(0);
+			}
+			break;
+		}
+		bytes += strlen(buf);
+	}
+done:
+	va_end(ap);
+
+	if (*buffer != NULL) {
+		tmp = realloc(*buffer, bytes + 1);
+		if (!tmp) return 0;
+		tmp[bytes] = '\0';
+		*buffer = tmp;
+	}
+	else {
+		tmp = calloc(bytes + 1, sizeof(char));
+		*buffer = tmp;
+	}
+	printf("Bytes: %lld\n", bytes);
+	//buffer_size = strlen(tmp);
+	va_start(ap, format);
+	vsnprintf(&tmp[buffer_size], bytes - buffer_size, format, ap);
+	va_end(ap);
+	return 1;
+	#undef X_FORMAT
+}
+
+#if 0
 /* DBL_MAX's length = 316 characters, go to 512 for good measure */
 enum { STRCATF_BUFSIZ = 512 };
 static char strcatf_buf[STRCATF_BUFSIZ];
@@ -24,14 +225,17 @@ static void strcatf_clear_buf()
 
 char *strcatf(char *dest, const char *fmt, ...)
 {
-	if (!fmt) {
-		return NULL;
-	}
-
 	size_t destlen;
 	size_t fmtlen = strlen(fmt);
 	va_list arglist;
+	size_t i, bytes;
+	char *tmp;
+
 	va_start(arglist, fmt);
+
+	if (!fmt) {
+		return NULL;
+	}
 
 	/* allow for NULL dest, create a new string */
 	if (dest) {
@@ -42,9 +246,6 @@ char *strcatf(char *dest, const char *fmt, ...)
 	}
 
 	/* record the number of bytes needed to hold the formatted string */
-	size_t i, bytes;
-	char *tmp;
-
 	for (i = 0, bytes = destlen; i < fmtlen; i++) {
 		if (fmt[i] == '%') {
 			switch(fmt[i + 1]) {
@@ -279,6 +480,7 @@ size_t strfmtlen_a(double number)
 	snprintf(strcatf_buf, STRCATF_BUFSIZ, "%a", number);
 	return strlen(strcatf_buf);
 }
+#endif
 
 int strcat_safe(char *destination, char *source)
 {

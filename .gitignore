@@ -5,3 +5,4 @@ jlibtest
 *.o
 *.a
 test.py
+#*#

@@ -186,6 +186,7 @@ static void test_py(void)
 
 static void test_str(void)
 {
+	#if 0
 	assert(strfmtlen_d(INT_MAX) == 10);
 	assert(strfmtlen_d(0) == 1);
 	assert(strfmtlen_d(INT_MIN) == 11);
@@ -206,33 +207,33 @@ static void test_str(void)
 	assert(strfmtlen_e(DBL_MAX) == 13);
 	assert(strfmtlen_e(0.0) == 12);
 	assert(strfmtlen_a(DBL_MAX) == 23);
+	#endif
+	//char *lit = strdup("1234567890");
+	//printf("literal = %s\n", lit);
 
-	char *lit = strdup("1234567890");
-	printf("literal = %s\n", lit);
-
-	char *build = strcatf(NULL, "%d %lf %s", 1, 177.2, "tester");
-	build = strcatf(build, " %llu", 10000ULL);
+	char *build = NULL;
+	strcatf(&build, "%d %lf %s", 1, 177.2, "tester");
+	strcatf(&build, " %llu", 10000ULL);
 	printf("%s\n", build);
-	
 	free(build);
 
-	char *s = strndup("0123456789", 3);
-	printf("%s\n", s);
-	free(s);
+	//char *s = strndup("0123456789", 3);
+	//printf("%s\n", s);
+	//free(s);
 
-	char *words = "Hello, how is your day today? I'm hoping you are doing well!";
-	char **split = strsplit(words, " ,?!");
-	size_t i;
+	//char *words = "Hello, how is your day today? I'm hoping you are doing well!";
+	//char **split = strsplit(words, " ,?!");
+	//size_t i;
 
-	printf("Words: %s\n", words);
-	printf("Split: ");
+	//printf("Words: %s\n", words);
+	//printf("Split: ");
 	
-	for (i = 0; split[i]; i++) {
-		printf("%s ", split[i]);
-	}
-	printf("\n");
+	//for (i = 0; split[i]; i++) {
+	//	printf("%s ", split[i]);
+	//}
+	//printf("\n");
 
-	strsplit_free(split);
+	//strsplit_free(split);
 }
 
 static void test_timer(void)

@@ -20,8 +20,8 @@
  *    If base is a different string than the return value,
  *    then \a base will point to an invalid address (due to realloc)
  */
-char *strcatf(char *base, const char *fmt, ...);
-
+int strcatf(char **buffer, const char *format, ...);
+#if 0
 /* find the length of the string equivalent of the number */
 size_t strfmtlen_d(long long number);  /* signed integer */
 #define strfmtlen_i strfmtlen_d
@@ -38,7 +38,7 @@ size_t strfmtlen_lf(double number); /* float 64, assume IEEE 754 and Little Endi
 size_t strfmtlen_e(double number); /* scientific notation, ignore shortest notation */
 #define strfmtlen_g strfmtlen_e
 size_t strfmtlen_a(double number); /* hexadecimal floating point */
-
+#endif
 int strcat_safe(char *destination, char *source);
 
 int streq(const char *str0, const char *str1);
