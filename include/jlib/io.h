@@ -22,4 +22,9 @@ int file_append(const char *fname, const char *str);
  */
 int file_read_csv(const char *fname, const char *sep, double *mx, size_t y, size_t x);
 
+/**
+ * Perform a hexdump of a buffer
+ */
+void memdump(void *buf, size_t size);
+
 #endif /* JLIB_IO_H */

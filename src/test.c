@@ -214,6 +214,7 @@ static void test_str(void)
 	char *build = NULL;
 	strcatf(&build, "%d %lf %s", 1, 177.2, "tester");
 	strcatf(&build, " %llu", 10000ULL);
+	strcatf(&build, " %lf", 2e123);
 	printf("%s\n", build);
 	free(build);
 

@@ -94,3 +94,52 @@ int file_read_csv(const char *fname, const char *sep, double *mx, size_t y, size
 	free(raw);
 	return 1;
 }
+
+#include <ctype.h>
+
+void memdump(void *buf, size_t size)
+{
+	#define X_WIDTH 10
+
+	size_t i, j;
+	unsigned char tmp;
+	unsigned char data[X_WIDTH];
+	memset(data, 0, sizeof(data));
+
+	for (i = 0; i < size; i++) {
+		tmp = ((unsigned char *)buf)[i];
+		printf("%02X ", tmp);
+
+		if (isprint(tmp)) {
+			data[i % X_WIDTH] = tmp;
+		}
+		else {
+			data[i % X_WIDTH] = '.';
+		}
+
+		if ((i + 1) % X_WIDTH == 0) {
+			printf("\t");
+			for (j = 0; j < X_WIDTH; j++) {
+				printf("%c", data[j]);
+			}
+			memset(data, 0, sizeof(data));
+			printf("\n");
+		}
+	}
+
+	for (; i % X_WIDTH != 0; i++) {
+		printf("00 ");
+		data[i % X_WIDTH] = '.';
+	}
+
+	if (i % X_WIDTH == 0) {
+		printf("\t");
+		for (j = 0; j < X_WIDTH; j++) {
+			printf("%c", data[j]);
+		}
+		memset(data, 0, sizeof(data));
+	}
+	printf("\n");
+
+	#undef X_WIDTH
+}
