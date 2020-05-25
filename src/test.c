@@ -211,12 +211,20 @@ static void test_str(void)
 	//char *lit = strdup("1234567890");
 	//printf("literal = %s\n", lit);
 
-	char *build = NULL;
+	/*char *build = NULL;
 	strcatf(&build, "%d %lf %s", 1, 177.2, "tester");
 	strcatf(&build, " %llu", 10000ULL);
 	strcatf(&build, " %lf", 2e123);
 	printf("%s\n", build);
-	free(build);
+	free(build);*/
+
+	char *build = strdup("1234abc1234abc1234abc");
+	if (streplace(&build, "abc", "yesno")) {
+		printf("%s\n", build);
+	}
+	else {
+		printf("Failure\n");
+	}
 
 	//char *s = strndup("0123456789", 3);
 	//printf("%s\n", s);
