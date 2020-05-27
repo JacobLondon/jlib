@@ -167,9 +167,19 @@ int strcatf(char **buffer, const char *format, ...)
 			}
 			break;
 			case 's': switch (type_info) {
-				case X_NONE: X_FORMAT(  "%s", char*);
-				case X_L:    X_FORMAT( "%ls", wchar_t*);
-				default:     return 0;
+				case X_NONE:
+					tmp = va_arg(ap, char*);
+					assert(tmp);
+					bytes -= sizeof("%s") - 1;
+					bytes += strlen(tmp);
+					continue;
+				case X_L:
+					tmp = (char *)va_arg(ap, wchar_t*);
+					assert(tmp);
+					bytes -= sizeof("%ls") - 1;
+					bytes += wcslen((wchar_t *)tmp);
+					continue;
+				default:     assert(0);
 			}
 			break;
 			case 'p': switch (type_info) {
