@@ -4,6 +4,7 @@ CFLAGS = -std=c11 -O2 -Wall -Wextra -lm -Iinclude/
 
 OBJ_FILES=\
 	src/arg.o \
+	src/astar.o \
 	src/debug.o \
 	src/farray.o \
 	src/fmap.o \

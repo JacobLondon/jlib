@@ -2,6 +2,7 @@
 #define JLIB_JLIB_H
 
 #include "arg.h"
+#include "astar.h"
 #include "debug.h"
 #include "farray.h"
 #include "fmap.h"

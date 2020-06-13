@@ -2,7 +2,7 @@
 
 #include <jlib/parray.h>
 
-struct parray *parray_new(void (* del)(void *buf))
+struct parray *parray_new(void (* dtor)(void *buf))
 {
 	struct parray *self = malloc(sizeof(struct parray));
 	if (!self) {
@@ -17,7 +17,7 @@ struct parray *parray_new(void (* del)(void *buf))
 
 	self->size = 0;
 	self->cap  = PARRAY_DEFAULT_CAP;
-	self->free = del;
+	self->dtor = dtor;
 
 	return self;
 }
@@ -31,8 +31,8 @@ void parray_free(struct parray *self)
 	if (self->buf) {
 		size_t i;
 		for (i = 0; i < self->size; i++) {
-			if (*(self->buf + i) && self->free) {
-				self->free(*(self->buf + i));
+			if (*(self->buf + i) && self->dtor) {
+				self->dtor(*(self->buf + i));
 			}
 			*(self->buf + i) = NULL;
 		}
@@ -41,7 +41,7 @@ void parray_free(struct parray *self)
 
 	self->buf = NULL;
 	self->cap = 0;
-	self->free = NULL;
+	self->dtor = NULL;
 	self->size = 0;
 	free(self);
 }
@@ -62,8 +62,8 @@ void parray_pop(struct parray *self)
 		self->size--;
 	}
 
-	if (self->free && self->buf[self->size]) {
-		self->free(self->buf[self->size]);
+	if (self->dtor && self->buf[self->size]) {
+		self->dtor(self->buf[self->size]);
 	}
 
 	self->buf[self->size] = NULL;

@@ -33,6 +33,49 @@ static void test_arg(void)
 	printf("%d\t%d\t%d\n", defs.count_num, defs.c, defs.v);
 }
 
+char myarray[10][10] = {
+	"          ",
+	"######### ",
+	"          ",
+	" #########",
+	"          ",
+	"######### ",
+	"          ",
+	" #########",
+	"          ",
+	"######### ",
+};
+
+static bool my_obstacle_cb(int i, int j)
+{
+	return myarray[i][j] == '#';
+}
+
+static void test_astar(void)
+{
+	int xs[100] = { 0 };
+	int ys[100] = { 0 };
+	long size;
+	int i, j;
+
+	astar_init(10, 10, my_obstacle_cb);
+	size = astar_path(xs, ys, 100, 0, 0, 9, 9);
+	printf("Path is %zu units\n", size);
+
+	for (i = 0; i < size; i++) {
+		myarray[ys[i]][xs[i]] = '.';
+	}
+
+	for (i = 0; i < 10; i++) {
+		for (j = 0; j < 10; j++) {
+			printf("%c ", myarray[i][j]);
+		}
+		printf("\n");
+	}
+
+	astar_cleanup();
+}
+
 static void test_debug(void)
 {
 	HERE(1);
@@ -254,6 +297,8 @@ int main(int argc, char **argv)
 {
 	if (arg_check(argc, argv, "--arg"))
 		test_arg();
+	else if (arg_check(argc, argv, "--astar"))
+		test_astar();
 	else if (arg_check(argc, argv, "--debug"))
 		test_debug();
 	else if (arg_check(argc, argv, "--farray"))
@@ -273,7 +318,7 @@ int main(int argc, char **argv)
 	else if (arg_check(argc, argv, "--io"))
 		test_io();
 	else {
-		puts("Usage:\n--arg\n--debug\n--farray\n--parray\n--py\n--fmap\n--str\n--timer");
+		puts("Usage:\n--arg\n--astar\n--debug\n--farray\n--parray\n--py\n--fmap\n--str\n--timer");
 	}
 
 	return 0;
