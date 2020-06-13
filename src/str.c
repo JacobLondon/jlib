@@ -174,10 +174,10 @@ int strcatf(char **buffer, const char *format, ...)
 					bytes += strlen(tmp);
 					continue;
 				case X_L:
-					tmp = (char *)va_arg(ap, wchar_t*) * sizeof(wchar_t);
+					tmp = (char *)va_arg(ap, wchar_t*);
 					assert(tmp);
 					bytes -= sizeof("%ls") - 1;
-					bytes += wcslen((wchar_t *)tmp);
+					bytes += wcslen((wchar_t *)tmp) * sizeof(wchar_t);
 					continue;
 				default:     assert(0);
 			}

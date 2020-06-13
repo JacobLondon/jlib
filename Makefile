@@ -10,6 +10,7 @@ OBJ_FILES=\
 	src/fmap.o \
 	src/gc.o \
 	src/io.o \
+	src/list.o \
 	src/math.o \
 	src/parray.o \
 	src/str.o \

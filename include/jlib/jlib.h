@@ -8,6 +8,7 @@
 #include "fmap.h"
 #include "gc.h"
 #include "io.h"
+#include "list.h"
 #include "math.h"
 #include "parray.h"
 #include "str.h"

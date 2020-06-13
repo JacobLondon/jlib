@@ -205,6 +205,23 @@ static void test_io(void)
 	printf("%lf %lf %lf %lf\n", mx[2][0], mx[2][1], mx[2][2], mx[2][3]);
 }
 
+static void test_list(void)
+{
+	struct list *mylist = list_new();
+	struct node *p = list_push_front(mylist, malloc(sizeof(int)));
+	*(int *)p->value = 1;
+
+	p = list_push_back(mylist, malloc(sizeof(int)));
+	*(int *)p->value = 2;
+
+	struct node *cur;
+	for (cur = mylist->head; cur != NULL; cur = cur->next) {
+		printf("%d\n", *(int *)cur->value);
+	}
+
+	list_free(mylist);
+}
+
 static void test_py(void)
 {
 #if 0
@@ -325,8 +342,10 @@ int main(int argc, char **argv)
 		test_timer();
 	else if (arg_check(argc, argv, "--io"))
 		test_io();
+	else if (arg_check(argc, argv, "--list"))
+		test_list();
 	else {
-		puts("Usage:\n--arg\n--astar\n--debug\n--farray\n--parray\n--py\n--fmap\n--str\n--timer");
+		puts("Usage:\n--arg\n--astar\n--debug\n--farray\n--parray\n--py\n--fmap\n--str\n--timer\n--io\n--list");
 	}
 
 	return 0;
