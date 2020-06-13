@@ -254,30 +254,38 @@ static void test_str(void)
 	//char *lit = strdup("1234567890");
 	//printf("literal = %s\n", lit);
 
-	char *build = NULL;
+	/*char *build = NULL;
 	strcatf(&build, "%d %lf %s", 1, 177.2, "tester");
 	strcatf(&build, " %llu", 10000ULL);
 	strcatf(&build, " %lf", 2e123);
 	printf("%s\n", build);
-	free(build);
+	free(build);*/
+
+	/*char *build = strdup("1234abc1234abc1234abc");
+	if (streplace(&build, "abc", "yesno")) {
+		printf("%s\n", build);
+	}
+	else {
+		printf("Failure\n");
+	}*/
 
 	//char *s = strndup("0123456789", 3);
 	//printf("%s\n", s);
 	//free(s);
 
-	//char *words = "Hello, how is your day today? I'm hoping you are doing well!";
-	//char **split = strsplit(words, " ,?!");
-	//size_t i;
+	char *words = "Hello, how is your day today? I'm hoping you are doing well!";
+	char **split = strsplit(words, " ,?!");
+	size_t i;
 
-	//printf("Words: %s\n", words);
-	//printf("Split: ");
+	printf("Words: %s\n", words);
+	printf("Split: ");
 	
-	//for (i = 0; split[i]; i++) {
-	//	printf("%s ", split[i]);
-	//}
-	//printf("\n");
+	for (i = 0; split[i]; i++) {
+		printf("%s\n", split[i]);
+	}
+	printf("\n");
 
-	//strsplit_free(split);
+	strsplit_free(split);
 }
 
 static void test_timer(void)

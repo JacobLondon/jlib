@@ -41,6 +41,11 @@ char *strndup(const char *str, size_t n);
 char **strsplit(char *s, const char *fmt);
 void strsplit_free(char **buf);
 
+/**
+ * Replace all instances of a substring from within a string
+ */
+int streplace(char **s, const char *old, const char *new);
+
 #define _STRINGIFY(x) #x
 #define STRINGIFY(x) _STRINGIFY(x)
 
