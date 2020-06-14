@@ -218,6 +218,7 @@ int strcat_safe(char *destination, char *source)
 	if (!tmp) {
 		return 0;
 	}
+	destination = tmp;
 	(void)strcat(destination, source);
 	destination[size] = '\0';
 	return 1;
@@ -374,3 +375,68 @@ int streplace(char **s, const char *old, const char *new)
 
 	return 1;
 }
+
+char *strin(char *haystack, char *needles)
+{
+	char *p, *ret;
+	
+	assert(haystack);
+	if (!needles) {
+		return NULL;
+	}
+
+	for (p = needles; *p != '\0'; p++) {
+		ret = strchr(haystack, *p);
+		if (ret) {
+			return ret;
+		}
+	}
+	return NULL;
+}
+
+int strstarts(char *str, char *sub)
+{
+	assert(str);
+	if (!sub) {
+		return 0;
+	}
+
+	if (strstr(str, sub) == str) {
+		return 1;
+	}
+	return 0;
+}
+
+int strends(char *str, char *sub)
+{
+	assert(str);
+	if (!sub) {
+		return 0;
+	}
+
+	if (strstr(str, sub) == (char *)(strlen(str) - strlen(sub))) {
+		return 1;
+	}
+	return 0;
+}
+
+int strstregex(char *str, regex_t re)
+{
+	int ret;
+	char err[128];
+	assert(str);
+	ret = regexec(&re, str, 0, NULL, 0);
+	if (!ret) {
+		return 0;
+	}
+	else if (ret == REG_NOMATCH) {
+		return ret;
+	}
+	else {
+		regerror(ret, &re, err, sizeof(err));
+		fprintf(stderr, "Regex Failure: %s\n", msgbuf);
+		assert(0);
+	}
+	return 1;
+}
+

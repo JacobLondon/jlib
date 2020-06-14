@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <string.h>
+#include <regex.h>
 
 /**
  * \brief Use printf modifiers to cat to a string with size reallocation.
@@ -45,6 +46,27 @@ void strsplit_free(char **buf);
  * Replace all instances of a substring from within a string
  */
 int streplace(char **s, const char *old, const char *new);
+
+/**
+ * Similar to strstr, but returns the first pointer to any
+ * of the needles in the haystack
+ */
+char *strin(char *haystack, char *needles);
+
+/**
+ * Return 1 if str starts with sub, else 0
+ */
+int strstarts(char *str, char *sub);
+
+/**
+ * Return 1 if str ends with sub, else 0
+ */
+int strends(char *str, char *sub);
+
+/**
+ * Return 0 if re has a match in str, else Regex error code.
+ */
+int strstregex(char *str, regex_t re);
 
 #define _STRINGIFY(x) #x
 #define STRINGIFY(x) _STRINGIFY(x)
