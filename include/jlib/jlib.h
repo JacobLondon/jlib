@@ -9,6 +9,7 @@
 #include "gc.h"
 #include "io.h"
 #include "list.h"
+#include "mallog.h"
 #include "math.h"
 #include "parray.h"
 #include "str.h"

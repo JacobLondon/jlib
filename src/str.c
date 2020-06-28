@@ -420,6 +420,7 @@ int strends(char *str, char *sub)
 	return 0;
 }
 
+#if 0
 int strstregex(char *str, regex_t re)
 {
 	int ret;
@@ -439,4 +440,5 @@ int strstregex(char *str, regex_t re)
 	}
 	return 1;
 }
+#endif
 

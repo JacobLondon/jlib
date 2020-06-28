@@ -11,6 +11,7 @@ OBJ_FILES=\
 	src/gc.o \
 	src/io.o \
 	src/list.o \
+	src/mallog.o \
 	src/math.o \
 	src/parray.o \
 	src/str.o \

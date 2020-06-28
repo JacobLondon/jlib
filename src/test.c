@@ -318,6 +318,22 @@ static void test_timer(void)
 	printf("Duration: %lf\n", dur);
 }
 
+static void test_mallog(void)
+{
+	int i;
+	void *ptrs[50] = { NULL };
+	for (i = 0; i < 50; i++) {
+		ptrs[i] = log_malloc(sizeof(int));
+	}
+
+	for (i = 0; i < 50; i++) {
+		log_free(ptrs[i]);
+	}
+
+	log_dump();
+	log_cleanup();
+}
+
 int main(int argc, char **argv)
 {
 	if (arg_check(argc, argv, "--arg"))
@@ -344,8 +360,10 @@ int main(int argc, char **argv)
 		test_io();
 	else if (arg_check(argc, argv, "--list"))
 		test_list();
+	else if (arg_check(argc, argv, "--mallog"))
+		test_mallog();
 	else {
-		puts("Usage:\n--arg\n--astar\n--debug\n--farray\n--parray\n--py\n--fmap\n--str\n--timer\n--io\n--list");
+		puts("Usage:\n--arg\n--astar\n--debug\n--farray\n--parray\n--py\n--fmap\n--str\n--timer\n--io\n--list\n--mallog\n");
 	}
 
 	return 0;

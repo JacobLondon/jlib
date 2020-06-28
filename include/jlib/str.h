@@ -66,9 +66,11 @@ int strends(char *str, char *sub);
 /**
  * Return 0 if re has a match in str, else Regex error code.
  */
+#if 0
 int strstregex(char *str, regex_t re);
+#endif
 
-#define _STRINGIFY(x) #x
-#define STRINGIFY(x) _STRINGIFY(x)
+#define XSTRINGIFY(x) #x
+#define STRINGIFY(x) XSTRINGIFY(x)
 
 #endif /* JLIB_STR_H */
