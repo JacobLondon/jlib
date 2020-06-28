@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <memory.h>
 #include <stdio.h>
 #include <jlib/gc.h>
 
@@ -13,9 +14,8 @@ static void ref_free(struct ref *self)
 	if (self->dtor) {
 		assert(self->val);
 		self->dtor(self->val);
-		self->dtor = NULL;
 	}
-	self->val = NULL;
+	memset(self, 0, sizeof(struct ref));
 }
 
 static void gc_resize(struct gc *self, size_t cap)
@@ -58,22 +58,42 @@ void gc_free(struct gc *self)
 	free(self);
 }
 
+void gc_free_ref(struct gc *self, void *buf)
+{
+	size_t i;
+	assert(self);
+	assert(buf);
+
+	for (i = self->size - 1;
+		(i < self->cap) &&
+		(self->refs[i].val != (void *)self);
+		i--)
+	{
+		if (self->refs[i].val == buf) {
+			ref_free(&self->refs[i]);
+		}
+		/* Keep gc size the same as the end didn't move
+		 * There is just an empty item in the middle somewhere */
+		break;
+	}
+}
+
 void *gc_alloc_dtor(struct gc *self, size_t size, void (*dtor)(void *val))
 {
 	assert(self);
 	void *val = calloc(1, size);
 	assert(val);
-	gc_push(self, val, dtor);
+	gc_push_dtor(self, val, dtor);
 	return val;
 }
 
 void gc_mark(struct gc *self)
 {
 	assert(self);
-	gc_push(self, self, NULL);
+	gc_push_dtor(self, self, NULL);
 }
 
-void gc_push(struct gc *self, void *val, void (*dtor)(void *val))
+void gc_push_dtor(struct gc *self, void *val, void (*dtor)(void *val))
 {
 	assert(self);
 
@@ -96,7 +116,7 @@ void gc_collect(struct gc *self)
 {
 	assert(self);
 
-	size_t i = 0;
+	size_t i;
 
 	/* remove all items after most recent mark */
 	for (i = self->size - 1;
