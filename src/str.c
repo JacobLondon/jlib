@@ -434,7 +434,7 @@ int strstregex(char *str, regex_t re)
 	}
 	else {
 		regerror(ret, &re, err, sizeof(err));
-		fprintf(stderr, "Regex Failure: %s\n", msgbuf);
+		fprintf(stderr, "Regex Failure: %s\n", err);
 		assert(0);
 	}
 	return 1;
