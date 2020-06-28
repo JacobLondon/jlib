@@ -8,7 +8,7 @@
 
 /* pointer array */
 struct parray {
-	void **buf;
+	void **buf;  /* can write / read from [indexing] */
 	size_t size; /* read-only */
 	size_t cap;  /* read-only */
 	void (* dtor)(void *buf);
@@ -28,12 +28,7 @@ void parray_free(struct parray *self);
 /**
  * Write a value at the end of the parray
  */
-void parray_push_(struct parray *self, void *value);
-
-/**
- * Write a value at the end of the array, automatically convert LValue to void*
- */
-#define parray_push(Arrayptr, LValue) parray_push_((Arrayptr), ((void*)&(LValue)))
+void parray_push(struct parray *self, void *value);
 
 /**
  * Remove and free the last item in the parray
@@ -44,18 +39,5 @@ void parray_pop(struct parray *self);
  * Change the maximum capacity of an farray
  */
 int parray_resize(struct parray *self, size_t cap);
-
-/**
- * RValue of item at the Index of the farray, and dereference it
- */
-#define parray_read(Arrayptr, Index, Type) (*(Type *)((Arrayptr)->buf[(Index)]))
-
-/**
- * Write the LValue at the parray's Index
- */
-#define parray_write(Arrayptr, Index, LValue) \
-	do { \
-		(Arrayptr)->buf[(Index)] = ((void*)&(LValue)); \
-	} while (0)
 
 #endif /* JLIB_ARRAY_H */
