@@ -46,7 +46,7 @@ void parray_free(struct parray *self)
 	free(self);
 }
 
-void parray_push_(struct parray *self, void *value)
+void parray_push(struct parray *self, void *value)
 {
 	/* realloc for more space */
 	if (self->size == self->cap) {

@@ -3,7 +3,6 @@
 
 #include <stddef.h>
 #include <string.h>
-#include <regex.h>
 
 /**
  * \brief Use printf modifiers to cat to a string with size reallocation.
@@ -70,7 +69,9 @@ int strends(char *str, char *sub);
 int strstregex(char *str, regex_t re);
 #endif
 
+#ifndef STRINGIFY
 #define XSTRINGIFY(x) #x
 #define STRINGIFY(x) XSTRINGIFY(x)
+#endif
 
 #endif /* JLIB_STR_H */

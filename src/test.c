@@ -123,6 +123,7 @@ static void test_farray(void)
 static void test_parray(void)
 {
 	struct parray *a = parray_new(NULL);
+#if 0
 	int b = 10;
 	int c = 11;
 	int d = 12;
@@ -138,6 +139,7 @@ static void test_parray(void)
 	/* will segfault, index 2 was just NULL'ed */
 	/* printf("%d\n", parray_read(a, 2, int)); */
 	printf("%d\n", parray_read(a, 1, int));
+#endif
 	parray_resize(a, 50);
 	parray_free(a);
 }
@@ -211,7 +213,7 @@ static void test_list(void)
 	struct node *p = list_push_front(mylist, malloc(sizeof(int)));
 	*(int *)p->value = 1;
 
-	p = list_push_back(mylist, malloc(sizeof(int)));
+	p = list_push_front(mylist, malloc(sizeof(int)));
 	*(int *)p->value = 2;
 
 	struct node *cur;

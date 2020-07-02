@@ -2,6 +2,7 @@
 #define JLIB_LIST_H
 
 #include <stddef.h> /* size_t */
+#include <malloc.h>
 
 struct node {
 	void *value;
@@ -12,13 +13,15 @@ struct node {
 struct list {
 	struct node *head;
 	struct node *tail;
-	size_t size;	
+	size_t size;
+	void (*dtor)(void *buf);
 };
 
 /**
  * Create a new, empty list
  */
-struct list *list_new(void);
+struct list *list_new_dtor(void (*dtor)(void *buf));
+#define list_new() list_new_dtor(free)
 
 /**
  * Free every value in a list, every node, and the list itself

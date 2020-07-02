@@ -1,7 +1,10 @@
 #include <assert.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#ifndef strdup
+#include <jlib/str.h>
+#endif
 #include <jlib/mallog.h>
 #include <jlib/parray.h>
 
@@ -23,7 +26,7 @@ static struct parray *infos = NULL;
 static struct info *info_new(void *ptr, size_t size, const char *sizeinfo);
 static void info_log_alloc(struct info *self, const char *file, const char *func, const char *line);
 static void info_log_dealloc(struct info *self, const char *file, const char *func, const char *line);
-static void info_free(struct info *self);
+static void info_free(void *self);
 static void info_dump(struct info *self);
 
 void log_init(void)
@@ -64,7 +67,7 @@ void *_log_malloc(size_t size, const char *sizeinfo, const char *file, const cha
 	assert(in);
 	
 	info_log_alloc(in, file, func, line);
-	parray_push_(infos, in);
+	parray_push(infos, in);
 	
 	return ptr;
 }
@@ -79,7 +82,7 @@ void *_log_calloc(size_t nmemb, size_t size, const char *sizeinfo, const char *f
 	assert(in);
 
 	info_log_alloc(in, file, func, line);
-	parray_push_(infos, in);
+	parray_push(infos, in);
 
 	return ptr;
 }
@@ -97,7 +100,7 @@ void *_log_realloc(void *ptr, size_t size, const char *sizeinfo, const char *fil
 	assert(in);
 
 	info_log_alloc(in, file, func, line);
-	parray_push_(infos, in);
+	parray_push(infos, in);
 
 	return ptr;
 
@@ -113,7 +116,7 @@ void *_log_strdup(const char *s, const char *sizeinfo, const char *file, const c
 	assert(in);
 
 	info_log_alloc(in, file, func, line);
-	parray_push_(infos, in);
+	parray_push(infos, in);
 
 	return ptr;
 }
@@ -127,9 +130,7 @@ void _log_free(void *ptr, const char *file, const char *func, const char *line)
 	for (i = 0; i < infos->size; i++) {
 		in = (struct info *)infos->buf[i];
 		if (in->ptr == ptr) {
-			in->dealloc_file = file;
-			in->dealloc_func = func;
-			in->dealloc_line = line;
+			info_log_dealloc(in, file, func, line);
 			break;
 		}
 	}
@@ -167,16 +168,17 @@ static void info_log_dealloc(struct info *self, const char *file, const char *fu
 	self->dealloc_line = line;
 }
 
-static void info_free(struct info *self)
+static void info_free(void *self)
 {
-	if (!self) {
+	struct info *in = self;
+	if (!in) {
 		return;
 	}
-	if (self->ptr) {
-		free(self->ptr);
+	if (in->ptr) {
+		free(in->ptr);
 	}
-	memset(self, 0, sizeof(struct info));
-	free(self);
+	memset(in, 0, sizeof(struct info));
+	free(in);
 }
 
 static void info_dump(struct info *self)

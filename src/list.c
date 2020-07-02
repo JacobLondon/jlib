@@ -3,11 +3,12 @@
 #include <stdlib.h>
 #include <jlib/list.h>
 
-struct list *list_new(void)
+struct list *list_new_dtor(void (*dtor)(void *buf))
 {
 	struct list *self = calloc(1, sizeof(struct list));
 	assert(self);
 	self->head = self->tail;
+	self->dtor = dtor;
 	return self;
 }
 
@@ -20,7 +21,6 @@ void list_free(struct list *self)
 		list_remove(self, self->head);
 	}
 
-skip:
 	memset(self, 0, sizeof(struct list));
 	free(self);
 }
@@ -55,7 +55,7 @@ void list_remove(struct list *self, struct node *cursor)
 	}
 
 	memset(cursor, 0, sizeof(struct node));
-	free(cursor);	
+	free(cursor);
 }
 
 struct node *list_push_front(struct list *self, void *value)
