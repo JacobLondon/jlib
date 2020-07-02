@@ -11,12 +11,12 @@
 typedef struct node_tag {
 	float global_goal;
 	float local_goal;
-	int x;
-	int y;
-	bool obstacle;
-	bool visited;
 	struct node_tag *neighbors[NEIGHBORS_MAX];
 	struct node_tag *parent;
+	unsigned short x; // max grid is 65535 x 65535
+	unsigned short y;
+	bool obstacle;
+	bool visited;
 } node;
 
 // non-resizeable, max size sets in stone
@@ -226,7 +226,7 @@ static void astar_solve(int si, int sj, int ei, int ej)
 	node *start;
 	node *end;
 	node *current;
-	unsigned char i;
+	unsigned char i; // less than NEIGHBORS_MAX
 	float possible_goal;
 
 	astar_reset();
@@ -268,17 +268,17 @@ static void astar_solve(int si, int sj, int ei, int ej)
 	}
 }
 
-size_t astar_path(int *xs, int *ys, size_t size, int si, int sj, int ei, int ej)
+size_t astar_path(unsigned *xs, unsigned *ys, size_t size, unsigned si, unsigned sj, unsigned ei, unsigned ej)
 {
 	size_t count = 0;
 	node *n;
 	assert(initialized);
 	assert(xs);
 	assert(ys);
-	assert(0 <= si && si < (long long)astar_height);
-	assert(0 <= sj && sj < (long long)astar_width);
-	assert(0 <= ei && ei < (long long)astar_height);
-	assert(0 <= ej && ej < (long long)astar_width);
+	assert(si < astar_height);
+	assert(sj < astar_width);
+	assert(ei < astar_height);
+	assert(ej < astar_width);
 	astar_solve(si, sj, ei, ej);
 	for (n = &astar_nodes[ei * astar_width + ej]; n->parent; n = n->parent) {
 		if (count < size) {

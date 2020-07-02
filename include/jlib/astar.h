@@ -78,6 +78,6 @@ void astar_cleanup(void);
  * // done
  * astar_cleanup();
  */
-size_t astar_path(int *xs, int *ys, size_t size, int si, int sj, int ei, int ej);
+size_t astar_path(unsigned *xs, unsigned *ys, size_t size, unsigned si, unsigned sj, unsigned ei, unsigned ej);
 
 #endif // JLIB_ASTAR_H
