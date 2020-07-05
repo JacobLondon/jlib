@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 #include <jlib/str.h>
 
@@ -31,15 +32,14 @@ int strcatf(char **buffer, const char *format, ...)
 	long long int bytes;
 	char *p, *tmp;
 
-	enum X_TYPE_INFO {
+	enum {
 		X_NONE = 0x00,
 		X_L    = 0x01,
 		X_LL   = 0x02,
 		X_Z    = 0x04,
 		X_J    = 0x08,
 		X_T    = 0x10
-	};
-	unsigned char type_info;
+	} type_info;
 
 	if (format == NULL || buffer == NULL) {
 		return 0;
@@ -442,3 +442,92 @@ int strstregex(char *str, regex_t re)
 }
 #endif
 
+struct sslice sslice_new(const char *str, size_t len)
+{
+	return (struct sslice){ str, len };
+}
+
+struct sslice sslice_cpy(struct sslice *self)
+{
+	return (struct sslice){ self->str, self->len };
+}
+
+int sslice_cmp(struct sslice *self, struct sslice *other)
+{
+	return strncmp(self->str, other->str, self->len);
+}
+
+int sslice_scmp(struct sslice *self, char *str)
+{
+	return strncmp(self->str, str, self->len);
+}
+
+char *sslice_strchr(struct sslice *self, int c)
+{
+	return memchr(self->str, c, self->len);
+}
+
+void sslice_put(struct sslice *self)
+{
+	sslice_fput(self, stdout);
+}
+
+void sslice_fput(struct sslice *self, FILE *stream)
+{
+	char *p = (char *)self->str;
+	for (; (size_t)p - (size_t)self->str < (size_t)self->len; p++) {
+		(void)putc(*p, stream);
+	}
+}
+
+struct token *token_new(size_t id, const char *str, size_t lineno, size_t colno)
+{
+	/* store the base token info, and the string in the same allocation */
+	size_t len = strlen(str);
+	struct token *self = calloc(
+		3 + (size_t)ceil((double)len / (double)sizeof(size_t)),
+		sizeof(size_t));
+	assert(self);
+	self->id = id;
+	self->lineno = lineno;
+	self->colno = colno;
+	memcpy(self->str, str, len);
+	return self;
+}
+
+void token_free(struct token *self)
+{
+	assert(self);
+	free(self);
+}
+
+
+size_t token_get_id(struct token *self)
+{
+	assert(self);
+	return self->id;
+}
+
+size_t token_get_lineno(struct token *self)
+{
+	assert(self);
+	return self->lineno;
+}
+
+size_t token_get_colno(struct token *self)
+{
+	assert(self);
+	return self->colno;
+}
+
+char *token_get_str(struct token *self)
+{
+	assert(self);
+	return self->str;
+}
+
+void token_put(struct token *self)
+{
+	assert(self);
+	printf("%zu(%s):%zu:%zu\n", self->id, self->str, self->lineno, self->colno);
+}

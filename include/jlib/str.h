@@ -74,4 +74,38 @@ int strstregex(char *str, regex_t re);
 #define STRINGIFY(x) XSTRINGIFY(x)
 #endif
 
+/**
+ * Non-null terminated strings, looking into another string
+ */
+struct sslice {
+	const char *str;  /* NOT NULL TERMINATED */
+	size_t len; /* length of view */
+};
+
+struct sslice sslice_new(const char *str, size_t len);
+struct sslice sslice_cpy(struct sslice *self);
+int sslice_cmp(struct sslice *self, struct sslice *other);
+int sslice_scmp(struct sslice *self, char *str);
+char *sslice_strchr(struct sslice *self, int c);
+void sslice_put(struct sslice *self);
+void sslice_fput(struct sslice *self, FILE *stream);
+
+struct token {
+	size_t id;
+	size_t lineno;
+	size_t colno;
+	char str[1]; /* cheeky trick, will store str with the same allocation as token
+	                just need to make sure the string is on the same byte boundary
+	                as size_t */
+};
+
+struct token *token_new(size_t id, const char *str, size_t lineno, size_t colno);
+void token_free(struct token *self);
+
+size_t token_get_id(struct token *self);
+size_t token_get_lineno(struct token *self);
+size_t token_get_colno(struct token *self);
+char *token_get_str(struct token *self);
+void token_put(struct token *self);
+
 #endif /* JLIB_STR_H */

@@ -1,5 +1,8 @@
 #include <float.h>
 #include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 #include <jlib/jlib.h>
 
 static void test_arg(void)
@@ -53,8 +56,8 @@ static bool my_obstacle_cb(int i, int j)
 
 static void test_astar(void)
 {
-	int xs[100] = { 0 };
-	int ys[100] = { 0 };
+	unsigned xs[100] = { 0 };
+	unsigned ys[100] = { 0 };
 	long size;
 	int i, j;
 
@@ -303,8 +306,92 @@ static void test_str(void)
 		printf("%s\n", split[i]);
 	}
 	printf("\n");
-
 	strsplit_free(split);
+
+}
+
+static void test_token(void)
+{
+	FILE *fp = fopen("test/tokenize.txt", "r");
+	assert(fp);
+
+	int ch;
+	char buf[256] = { 0 };
+	char *bufp = buf;
+
+	size_t lineno = 1;
+	size_t colno = 1;
+	struct parray *tokens = parray_new((void (*)(void *))token_free);
+
+	enum tokid {
+		WHITESPACE,
+		WORD,
+		NUM,
+		PERIOD,
+		UNKNOWN,
+	};
+
+	while (!feof(fp)) {
+		ch = getc(fp);
+
+		if (bufp >= buf + sizeof(buf) - 1) {
+			fprintf(stderr, "Error: Token too large %s\n", buf);
+			break;
+		}
+
+		if (isspace(ch)) {
+			if (ch == '\n') {
+				lineno++;
+				colno = 1;
+			}
+			else if (ch == '\r') {
+				colno = 1;
+			}
+			else {
+				colno++;
+			}
+		}
+		else if (isalpha(ch)) {
+			*bufp++ = ch;
+			colno++;
+			ch = getc(fp);
+			if (!isalpha(ch)) {
+				parray_push(tokens, token_new(WORD, buf, lineno, colno - strlen(buf)));
+				memset(buf, 0, sizeof(buf));
+				bufp = buf;
+			}
+			ungetc(ch, fp);
+		}
+		else if (isdigit(ch)) {
+			*bufp++ = ch;
+			colno++;
+			ch = getc(fp);
+			if (!isdigit(ch)) {
+				parray_push(tokens, token_new(NUM, buf, lineno, colno - strlen(buf)));
+				memset(buf, 0, sizeof(buf));
+				bufp = buf;
+			}
+			ungetc(ch, fp);
+		}
+		else if (ch == '.') {
+			parray_push(tokens, token_new(PERIOD, ".", lineno, colno));
+			colno++;
+		}
+		else {
+			buf[0] = ch;
+			parray_push(tokens, token_new(UNKNOWN, buf, lineno, colno));
+			buf[0] = 0;
+			colno++;
+		}
+	}
+
+	size_t i;
+	for (i = 0; i < tokens->size; i++) {
+		token_put(tokens->buf[i]);
+	}
+
+	fclose(fp);
+	parray_free(tokens);
 }
 
 static void test_timer(void)
@@ -358,6 +445,8 @@ int main(int argc, char **argv)
 		test_str();
 	else if (arg_check(argc, argv, "--timer"))
 		test_timer();
+	else if (arg_check(argc, argv, "--token"))
+		test_token();
 	else if (arg_check(argc, argv, "--io"))
 		test_io();
 	else if (arg_check(argc, argv, "--list"))
@@ -365,7 +454,11 @@ int main(int argc, char **argv)
 	else if (arg_check(argc, argv, "--mallog"))
 		test_mallog();
 	else {
-		puts("Usage:\n--arg\n--astar\n--debug\n--farray\n--parray\n--py\n--fmap\n--str\n--timer\n--io\n--list\n--mallog\n");
+		puts("\
+Usage:\n--arg\n--astar\n--debug\n\
+--farray\n--parray\n--py\n--fmap\n\
+--str\n--timer\n--io\n--list\n--mallog\n\
+--token\n");
 	}
 
 	return 0;
