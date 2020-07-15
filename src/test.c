@@ -316,6 +316,7 @@ static void test_token(void)
 	assert(fp);
 
 	int ch;
+	int idx = 0;
 	char buf[256] = { 0 };
 	char *bufp = buf;
 
@@ -356,7 +357,7 @@ static void test_token(void)
 			colno++;
 			ch = getc(fp);
 			if (!isalpha(ch)) {
-				parray_push(tokens, token_new(WORD, buf, lineno, colno - strlen(buf)));
+				parray_push(tokens, token_new(WORD, buf, idx, lineno, colno - strlen(buf)));
 				memset(buf, 0, sizeof(buf));
 				bufp = buf;
 			}
@@ -367,22 +368,23 @@ static void test_token(void)
 			colno++;
 			ch = getc(fp);
 			if (!isdigit(ch)) {
-				parray_push(tokens, token_new(NUM, buf, lineno, colno - strlen(buf)));
+				parray_push(tokens, token_new(NUM, buf, idx, lineno, colno - strlen(buf)));
 				memset(buf, 0, sizeof(buf));
 				bufp = buf;
 			}
 			ungetc(ch, fp);
 		}
 		else if (ch == '.') {
-			parray_push(tokens, token_new(PERIOD, ".", lineno, colno));
+			parray_push(tokens, token_new(PERIOD, ".", idx, lineno, colno));
 			colno++;
 		}
 		else {
 			buf[0] = ch;
-			parray_push(tokens, token_new(UNKNOWN, buf, lineno, colno));
+			parray_push(tokens, token_new(UNKNOWN, buf, idx, lineno, colno));
 			buf[0] = 0;
 			colno++;
 		}
+		idx++;
 	}
 
 	size_t i;

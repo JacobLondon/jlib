@@ -480,7 +480,7 @@ void sslice_fput(struct sslice *self, FILE *stream)
 	}
 }
 
-struct token *token_new(size_t id, const char *str, size_t lineno, size_t colno)
+struct token *token_new(size_t id, const char *str, size_t idx, size_t lineno, size_t colno)
 {
 	/* store the base token info, and the string in the same allocation */
 	size_t len = strlen(str);
@@ -489,6 +489,7 @@ struct token *token_new(size_t id, const char *str, size_t lineno, size_t colno)
 		sizeof(size_t));
 	assert(self);
 	self->id = id;
+	self->idx = idx;
 	self->lineno = lineno;
 	self->colno = colno;
 	memcpy(self->str, str, len);
@@ -502,32 +503,103 @@ void token_free(struct token *self)
 }
 
 
-size_t token_get_id(struct token *self)
-{
-	assert(self);
-	return self->id;
-}
-
-size_t token_get_lineno(struct token *self)
-{
-	assert(self);
-	return self->lineno;
-}
-
-size_t token_get_colno(struct token *self)
-{
-	assert(self);
-	return self->colno;
-}
-
-char *token_get_str(struct token *self)
-{
-	assert(self);
-	return self->str;
-}
-
 void token_put(struct token *self)
 {
 	assert(self);
 	printf("%zu(%s):%zu:%zu\n", self->id, self->str, self->lineno, self->colno);
 }
+
+struct tokenizer *tokenizer_new(const char *file, struct token *(*gettok)(FILE *stream))
+{
+	struct tokenizer *self = calloc(1, sizeof(struct tokenizer));
+	assert(self);
+	self->stream = fopen(file, "r");
+	assert(self->stream);
+	self->gettok = gettok;
+	return self;
+}
+
+void tokenizer_free(struct tokenizer *self)
+{
+	assert(self);
+	if (self->stream) {
+		fclose(self->stream);
+	}
+	tokenizer_clear(self);
+	free(self);
+}
+
+void tokenizer_clear(struct tokenizer *self)
+{
+	assert(self);
+
+	if (self->cur[0]) {
+		token_free(self->cur[0]);
+		self->cur[0] = NULL;
+	}
+	if (self->cur[1]) {
+		token_free(self->cur[1]);
+		self->cur[0] = NULL;
+	}
+	if (self->cur[2]) {
+		token_free(self->cur[2]);
+		self->cur[0] = NULL;
+	}
+}
+
+struct token *tokenizer_get1(struct tokenizer *self)
+{
+	tokenizer_clear(self);
+
+	if (feof(self->stream)) {
+		return NULL;
+	}
+
+	self->cur[0] = self->gettok(self->stream);
+	return self->cur[0];
+}
+
+struct token **tokenizer_get2(struct tokenizer *self)
+{
+	tokenizer_clear(self);
+
+	if (feof(self->stream)) {
+		return NULL;
+	}
+
+	self->cur[0] = self->gettok(self->stream);
+
+	if (feof(self->stream)) {
+		return NULL;
+	}
+
+	self->cur[1] = self->gettok(self->stream);
+
+	return self->cur;
+}
+
+struct token **tokenizer_get3(struct tokenizer *self)
+{
+	tokenizer_clear(self);
+
+	if (feof(self->stream)) {
+		return NULL;
+	}
+
+	self->cur[0] = self->gettok(self->stream);
+
+	if (feof(self->stream)) {
+		return NULL;
+	}
+
+	self->cur[1] = self->gettok(self->stream);
+
+	if (feof(self->stream)) {
+		return NULL;
+	}
+
+	self->cur[2] = self->gettok(self->stream);
+
+	return self->cur;
+}
+

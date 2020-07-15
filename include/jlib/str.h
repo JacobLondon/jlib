@@ -92,6 +92,7 @@ void sslice_fput(struct sslice *self, FILE *stream);
 
 struct token {
 	size_t id;
+	size_t idx;
 	size_t lineno;
 	size_t colno;
 	char str[1]; /* cheeky trick, will store str with the same allocation as token
@@ -99,13 +100,37 @@ struct token {
 	                as size_t */
 };
 
-struct token *token_new(size_t id, const char *str, size_t lineno, size_t colno);
+struct token *token_new(size_t id, const char *str, size_t idx, size_t lineno, size_t colno);
 void token_free(struct token *self);
-
-size_t token_get_id(struct token *self);
-size_t token_get_lineno(struct token *self);
-size_t token_get_colno(struct token *self);
-char *token_get_str(struct token *self);
 void token_put(struct token *self);
+
+struct tokenizer {
+	FILE *stream;
+	struct token *(*gettok)(FILE *stream);
+	struct token *cur[3];
+};
+
+struct tokenizer *tokenizer_new(const char *file, struct token *(*gettok)(FILE *stream));
+void tokenizer_free(struct tokenizer *self);
+
+/**
+ * Clear the cur tokens array
+ */
+void tokenizer_clear(struct tokenizer *self);
+
+/**
+ * Get a shared pointer to a current token, the tokenizer controls the ownership
+ * Multiple items need to be indexed to get the token pointer:
+ * 
+ * struct token *tok = tokenizer_get3(mytokernizer);
+ * token_put(tok[0]);
+ * token_put(tok[1]);
+ * token_put(tok[2]);
+ * 
+ * If eof at any point, get back NULL
+ */
+struct token *tokenizer_get1(struct tokenizer *self);
+struct token **tokenizer_get2(struct tokenizer *self);
+struct token **tokenizer_get3(struct tokenizer *self);
 
 #endif /* JLIB_STR_H */
