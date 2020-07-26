@@ -143,3 +143,34 @@ void memdump(void *buf, size_t size)
 
 	#undef X_WIDTH
 }
+
+#define CHECK_MALLOC_EXTRA 32
+
+void *check_malloc(size_t bytes)
+{
+	void *buf = malloc(CHECK_MALLOC_EXTRA + bytes + CHECK_MALLOC_EXTRA);
+	if (!buf) {
+		return NULL;
+	}
+	memset(buf, 0, CHECK_MALLOC_EXTRA + bytes + CHECK_MALLOC_EXTRA);
+	*((size_t *)buf) = bytes;
+	return ((char *)buf + CHECK_MALLOC_EXTRA);
+}
+
+void check_free(void *buf)
+{
+	char clear[CHECK_MALLOC_EXTRA] = { 0 };
+	size_t size = *(size_t *)((char *)buf - CHECK_MALLOC_EXTRA);
+
+	/* check before */
+	if (memcmp(buf - CHECK_MALLOC_EXTRA + sizeof(size_t), &clear[sizeof(size_t)], CHECK_MALLOC_EXTRA - sizeof(size_t)) != 0) {
+		memdump(buf - CHECK_MALLOC_EXTRA, CHECK_MALLOC_EXTRA + size + CHECK_MALLOC_EXTRA);
+	}
+	/* check after */
+	else if (memcmp(buf + size, clear, CHECK_MALLOC_EXTRA)) {
+		memdump((char *)buf - CHECK_MALLOC_EXTRA, CHECK_MALLOC_EXTRA + size + CHECK_MALLOC_EXTRA);
+	}
+	free(buf - CHECK_MALLOC_EXTRA);
+}
+
+#undef CHECK_MALLOC_EXTRA

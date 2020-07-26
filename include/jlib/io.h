@@ -27,4 +27,11 @@ int file_read_csv(const char *fname, const char *sep, double *mx, size_t y, size
  */
 void memdump(void *buf, size_t size);
 
+/**
+ * Perform a malloc with overrun check. Used with memdump
+ */
+void *check_malloc(size_t bytes);
+
+void check_free(void *buf);
+
 #endif /* JLIB_IO_H */

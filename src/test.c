@@ -210,6 +210,13 @@ static void test_io(void)
 	printf("%lf %lf %lf %lf\n", mx[2][0], mx[2][1], mx[2][2], mx[2][3]);
 }
 
+static void test_check(void)
+{
+	int *buf = check_malloc(sizeof(int) * 10);
+	buf[10] = 'F';
+	check_free(buf);
+}
+
 static void test_list(void)
 {
 	struct list *mylist = list_new();
@@ -455,6 +462,8 @@ int main(int argc, char **argv)
 		test_list();
 	else if (arg_check(argc, argv, "--mallog"))
 		test_mallog();
+	else if (arg_check(argc, argv, "--check"))
+		test_check();
 	else {
 		puts("\
 Usage:\n--arg\n--astar\n--debug\n\
