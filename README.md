@@ -47,7 +47,7 @@ struct gc *collector = gc_new();
 int *array0 = gc_alloc(collector, 10);
 // mark the sweep point
 gc_mark(collector);
-struct complex_type *array1 = gc_alloc_dtor(collector, 1, complex_free);
+struct complex_type *ct = gc_alloc_dtor(collector, 1, complex_free);
 // take an owned pointer of a single item
 int *array2 = malloc(sizeof(int));
 gc_push(collector, array2);
