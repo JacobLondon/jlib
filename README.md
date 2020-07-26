@@ -44,13 +44,13 @@ void draw_triangle(Color c, int x1, int y1, int x2, int y2, int x3, int y3)
 // gc.c
 // Perform allocation with a mark and sweep garbage collector
 struct gc *collector = gc_new();
-int *array0 = gc_alloc_dtor(collector, 10, NULL);
+int *array0 = gc_alloc(collector, 10);
 // mark the sweep point
 gc_mark(collector);
-int *array1 = gc_alloc_dtor(collector, 20, NULL);
-// take an owned pointer
-int *array2 = malloc(sizeof(int) * 30);
-gc_push_dtor(collector, array2);
+struct complex_type *array1 = gc_alloc_dtor(collector, 1, complex_free);
+// take an owned pointer of a single item
+int *array2 = malloc(sizeof(int));
+gc_push(collector, array2);
 // sweep until only array0 is left
 gc_collect(collector);
 // sweep array0
@@ -66,6 +66,7 @@ void *log_calloc(size_t nmemb, size_t size);
 void *log_realloc(void *ptr, size_t size);
 char *log_strdup(const char *str);
 void log_free(void *ptr);
+void log_dump(void);
 
 // math.c
 // Misc math functions (including fast sqrt / sin / cos)
