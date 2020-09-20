@@ -8,6 +8,11 @@
 char *file_read(const char *fname, size_t *size);
 
 /**
+ * Read a file into a buffer of given bytes
+ */
+int file_read_into(const char *fname, size_t bytes, void *buf);
+
+/**
  * Overwrite all data in a file with a string
  */
 int file_write(const char *fname, const char *str);

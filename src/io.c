@@ -7,24 +7,30 @@
 
 char *file_read(const char *fname, size_t *size)
 {
-	if (!fname) {
-		return NULL;
-	}
-
+	FILE *f;
 	char *buf;
 	size_t bytes;
 	long length;
 
-	FILE *f = fopen(fname, "rb");
-	assert(f);
+	if (!fname) {
+		return NULL;
+	}
+
+	f = fopen(fname, "rb");
+	if (!f) {
+		return NULL;
+	}
 
 	fseek(f, 0, SEEK_END);
 	length = ftell(f);
 	fseek(f, 0, SEEK_SET);
 
 	buf = malloc(length + 1);
-	assert(buf);
-	
+	if (!buf) {
+		fclose(f);
+		return NULL;
+	}
+
 	bytes = fread(buf, 1, length, f);
 	buf[bytes] = '\0';
 	if (size) {
@@ -33,6 +39,30 @@ char *file_read(const char *fname, size_t *size)
 
 	fclose(f);
 	return buf;
+}
+
+int file_read_into(const char *fname, size_t bytes, void *buf)
+{
+	FILE *f;
+	size_t count;
+
+	if (!fname || !buf) {
+		return 0;
+	}
+
+	f = fopen(fname, "r");
+	if (!f) {
+		return 0;
+	}
+
+	count = fread(buf, 1, bytes, f);
+	(void)fclose(f);
+
+	if (count != bytes) {
+		return 1;
+	}
+
+	return 2;
 }
 
 int file_write(const char *fname, const char *str)

@@ -6,6 +6,7 @@ OBJ_FILES=\
 	src/arg.o \
 	src/astar.o \
 	src/debug.o \
+	src/func.o \
 	src/farray.o \
 	src/fmap.o \
 	src/gc.o \
