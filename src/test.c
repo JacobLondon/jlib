@@ -219,18 +219,59 @@ static void test_check(void)
 
 static void test_list(void)
 {
-	struct list *mylist = list_new();
-	struct node *p = list_push_front(mylist, malloc(sizeof(int)));
-	*(int *)p->value = 1;
+	struct node *tmp;
+	struct node **cursor;
+	struct list *mylist = list_new(free);
 
-	p = list_push_front(mylist, malloc(sizeof(int)));
-	*(int *)p->value = 2;
+	list_push_front(mylist, strdup("1"));
+	printf("Second element: %p\n", list_tail(mylist));
+	tmp = list_push_back(mylist, strdup("3"));
+	printf("Second element: %p\n", list_tail(mylist));
+	tmp = list_insert_next(mylist, tmp, strdup("4"));
+	list_insert_next(mylist, mylist->head, strdup("2"));
+	list_push_back(mylist, strdup("4"));
+	list_push_front(mylist, strdup("0"));
+	list_pop_front(mylist);
+	list_pop_back(mylist);
+	list_remove(mylist, tmp);
 
-	struct node *cur;
-	for (cur = mylist->head; cur != NULL; cur = cur->next) {
-		printf("%d\n", *(int *)cur->value);
+	tmp = list_find(mylist, "1", strcmp);
+	printf("Found '1'?: %p\n", tmp);
+	list_remove(mylist, tmp);
+	tmp = list_find(mylist, "1", strcmp);
+	printf("Found '1' after remove?: %p\n", tmp);
+
+	for (cursor = list_iter_begin(mylist); !list_iter_done(cursor); list_iter_continue(&cursor)) {
+		printf("%s\n", (char *)list_iter_value(cursor));
 	}
 
+	while (mylist->head != NULL) {
+		list_remove(mylist, mylist->head);
+	}
+
+	list_push_front(mylist, strdup("1"));
+	printf("Second element: %p\n", list_tail(mylist));
+	tmp = list_push_back(mylist, strdup("3"));
+	printf("Second element: %p\n", list_tail(mylist));
+	tmp = list_insert_next(mylist, tmp, strdup("4"));
+	list_insert_next(mylist, mylist->head, strdup("2"));
+	list_push_back(mylist, strdup("4"));
+	list_push_front(mylist, strdup("0"));
+	list_pop_front(mylist);
+	list_pop_back(mylist);
+	list_remove(mylist, tmp);
+
+	tmp = list_find(mylist, "1", strcmp);
+	printf("Found '1'?: %p\n", tmp);
+	list_remove(mylist, tmp);
+	tmp = list_find(mylist, "1", strcmp);
+	printf("Found '1' after remove?: %p\n", tmp);
+
+	for (cursor = list_iter_begin(mylist); !list_iter_done(cursor); list_iter_continue(&cursor)) {
+		printf("%s\n", (char *)list_iter_value(cursor));
+	}
+
+	printf("Done\n");
 	list_free(mylist);
 }
 
