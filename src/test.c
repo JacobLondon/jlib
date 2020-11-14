@@ -360,6 +360,7 @@ static void test_str(void)
 
 static void test_token(void)
 {
+#if 0
 	FILE *fp = fopen("test/tokenize.txt", "r");
 	assert(fp);
 
@@ -442,6 +443,75 @@ static void test_token(void)
 
 	fclose(fp);
 	parray_free(tokens);
+#endif
+}
+
+enum MyTokenIds {
+	MY_WORD,
+	MY_PERIOD,
+	MY_NUMBER,
+	MY_WHITESPACE,
+	MY_UNKNOWN,
+	MY_END,
+};
+
+static struct token test_tok_gettok(struct tokenizer *ctx)
+{
+	struct token rv;
+	char ch;
+
+	if (isalpha(ctx->cursor[0])) {
+		rv.symbol = ctx->cursor;
+		rv.id = MY_WORD;
+		for (rv.len = 1; (ch = tokenizer_next(ctx)) && isalpha(ch); rv.len++);
+	}
+	else if (isdigit(ctx->cursor[0])) {
+		rv.symbol = ctx->cursor;
+		rv.id = MY_NUMBER;
+		for (rv.len = 1; (ch = tokenizer_next(ctx)) && isdigit(ch); rv.len++);
+	}
+	else if (isspace(ctx->cursor[0])) {
+		rv.symbol = ctx->cursor;
+		rv.id = MY_WHITESPACE;
+		for (rv.len = 1; (ch = tokenizer_next(ctx)) && isspace(ch); rv.len++);
+	}
+	else if (ctx->cursor[0] == '.') {
+		rv.symbol = ctx->cursor;
+		rv.id = MY_PERIOD;
+		rv.len = 1;
+		(void)tokenizer_next(ctx);
+	}
+	else if (ctx->cursor[0] == 0) {
+		rv.symbol = NULL;
+		rv.id = MY_END;
+		rv.len = 1;
+	}
+	else {
+		rv.symbol = ctx->cursor;
+		rv.id = MY_UNKNOWN;
+		rv.len = 1;
+		(void)tokenizer_next(ctx);
+	}
+
+	return rv;
+}
+
+static void test_tok(void)
+{
+	struct tokenizer context;
+	struct token tok;
+	size_t size;
+	char *text = file_read("test/tokenize.txt", &size);
+	tokenizer_new(text, size, test_tok_gettok, &context);
+
+	for (tok = tokenizer_gettok(&context);
+	     tok.id != MY_END;
+	     tok = tokenizer_gettok(&context))
+	{
+		token_puts(&tok);
+	}
+	tokenizer_del(&context);
+	free(text);
 }
 
 static void test_timer(void)
@@ -497,6 +567,8 @@ int main(int argc, char **argv)
 		test_timer();
 	else if (arg_check(argc, argv, "--token"))
 		test_token();
+	else if (arg_check(argc, argv, "--tok"))
+		test_tok();
 	else if (arg_check(argc, argv, "--io"))
 		test_io();
 	else if (arg_check(argc, argv, "--list"))

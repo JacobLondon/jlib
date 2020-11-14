@@ -89,7 +89,7 @@ int sslice_scmp(struct sslice *self, char *str);
 char *sslice_strchr(struct sslice *self, int c);
 void sslice_put(struct sslice *self);
 void sslice_fput(struct sslice *self, FILE *stream);
-
+#if 0
 struct token {
 	size_t id;
 	size_t idx;
@@ -132,5 +132,6 @@ void tokenizer_clear(struct tokenizer *self);
 struct token *tokenizer_get1(struct tokenizer *self);
 struct token **tokenizer_get2(struct tokenizer *self);
 struct token **tokenizer_get3(struct tokenizer *self);
+#endif
 
 #endif /* JLIB_STR_H */

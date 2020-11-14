@@ -1,6 +1,6 @@
 TARGET=jlibtest
 CC=gcc
-CFLAGS = -std=c11 -O2 -Wall -Wextra -lm -Iinclude/ -ggdb
+CFLAGS = -std=c11 -Wall -Wextra -lm -Iinclude/ -ggdb
 
 OBJ_FILES=\
 	src/arg.o \
@@ -16,6 +16,7 @@ OBJ_FILES=\
 	src/math.o \
 	src/parray.o \
 	src/str.o \
+	src/tok.o \
 	src/timer.o \
 	src/util.o
 

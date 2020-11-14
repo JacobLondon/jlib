@@ -480,6 +480,7 @@ void sslice_fput(struct sslice *self, FILE *stream)
 	}
 }
 
+#if 0
 struct token *token_new(size_t id, const char *str, size_t idx, size_t lineno, size_t colno)
 {
 	/* store the base token info, and the string in the same allocation */
@@ -602,4 +603,4 @@ struct token **tokenizer_get3(struct tokenizer *self)
 
 	return self->cur;
 }
-
+#endif

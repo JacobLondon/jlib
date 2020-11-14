@@ -13,6 +13,7 @@
 #include "math.h"
 #include "parray.h"
 #include "str.h"
+#include "tok.h"
 #include "timer.h"
 #include "util.h"
 
