@@ -235,10 +235,10 @@ static void test_list(void)
 	list_pop_back(mylist);
 	list_remove(mylist, tmp);
 
-	tmp = list_find(mylist, "1", strcmp);
+	tmp = list_find(mylist, "1", (int (*)(void *, void *))strcmp);
 	printf("Found '1'?: %p\n", tmp);
 	list_remove(mylist, tmp);
-	tmp = list_find(mylist, "1", strcmp);
+	tmp = list_find(mylist, "1", (int (*)(void *, void *))strcmp);
 	printf("Found '1' after remove?: %p\n", tmp);
 
 	for (cursor = list_iter_begin(mylist); !list_iter_done(cursor); list_iter_continue(&cursor)) {
@@ -261,10 +261,10 @@ static void test_list(void)
 	list_pop_back(mylist);
 	list_remove(mylist, tmp);
 
-	tmp = list_find(mylist, "1", strcmp);
+	tmp = list_find(mylist, "1", (int (*)(void *, void *))strcmp);
 	printf("Found '1'?: %p\n", tmp);
 	list_remove(mylist, tmp);
-	tmp = list_find(mylist, "1", strcmp);
+	tmp = list_find(mylist, "1", (int (*)(void *, void *))strcmp);
 	printf("Found '1' after remove?: %p\n", tmp);
 
 	for (cursor = list_iter_begin(mylist); !list_iter_done(cursor); list_iter_continue(&cursor)) {
@@ -510,6 +510,7 @@ static void test_tok(void)
 	{
 		token_puts(&tok);
 	}
+	printf("%zu tokens found\n", tokenizer_count(&context));
 	tokenizer_del(&context);
 	free(text);
 }

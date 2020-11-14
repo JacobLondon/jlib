@@ -143,6 +143,7 @@ int strcatf(char **buffer, const char *format, ...)
 				case X_L:    X_FORMAT( "%la", double);
 				default:     return 0;
 			}
+			break;
 			case 'f': /* fallthrough */
 			case 'F': switch (type_info) {
 				case X_NONE: X_FORMAT(  "%f", double);
