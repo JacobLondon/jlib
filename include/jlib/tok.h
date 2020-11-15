@@ -3,8 +3,6 @@
 
 #include <stddef.h>
 
-#include <jlib/farray.h>
-
 struct tokenizer;
 
 /**
@@ -32,7 +30,17 @@ struct tokenizer {
 	tokenizer_gettok_func gettok;
 };
 
+/**
+ * Initialize a tokenizer
+ * 
+ * \warning
+ *   the \a text must be SHARED with the tokenizer
+ */
 void tokenizer_new(char *text, size_t len, tokenizer_gettok_func gettok, struct tokenizer *out);
+
+/**
+ * Clear a tokenizer
+ */
 void tokenizer_del(struct tokenizer *self);
 
 /**
@@ -51,7 +59,8 @@ struct token tokenizer_gettok(struct tokenizer *self);
 char tokenizer_next(struct tokenizer *self);
 
 /**
- * Get the number of tokens in the buffer
+ * Get the number of tokens in the buffer, can use
+ * to allocate a buffer for tokens
  */
 size_t tokenizer_count(struct tokenizer *self);
 
