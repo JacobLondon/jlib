@@ -36,4 +36,38 @@ struct tree_node *tree_node_remove(struct tree_node *self, void (*dtor)(void *va
  */
 struct tree_node *tree_node_find(struct tree_node *self, void *query, int (*cmp)(void *value, void *query));
 
+/**
+ * Swap self with parent
+ */
+void tree_node_swap(struct tree_node *self);
+
+/**
+ * Given a \a parent collect \a number of its children into a new tree_node
+ * and make that tree_node the child of \a parent.
+ * 
+ * \example
+ *     a
+ *   / | \
+ *  b  c  d
+ * 
+ * tree_node_collect(a, 2)
+ * 
+ *      a
+ *    /   \
+ *   e     d
+ *  | \
+ *  b  c
+ * 
+ * \param parent
+ *   The node to operate on
+ * \param number
+ *   The number of items to collect.
+ *   0 to collect ALL items
+ * \return
+ *   0  success
+ *   1  \a number is larger than there are nodes to collect
+ *   2  parent has no children to collect
+ */
+int tree_node_collect(struct tree_node *parent, int number);
+
 #endif // JLIB_TREE_H

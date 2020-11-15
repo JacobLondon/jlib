@@ -155,3 +155,14 @@ struct tree_node *tree_node_find(struct tree_node *self, void *query, int (*cmp)
 	}
 	return NULL;
 }
+
+void tree_node_swap(struct tree_node *self)
+{
+	// TODO
+}
+
+int tree_node_collect(struct tree_node *parent, int number)
+{
+	// TODO
+	return 0;
+}
