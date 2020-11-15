@@ -18,6 +18,7 @@ OBJ_FILES=\
 	src/str.o \
 	src/tok.o \
 	src/timer.o \
+	src/tree.o \
 	src/util.o
 
 .PHONY: clean

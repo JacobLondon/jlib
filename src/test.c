@@ -219,8 +219,8 @@ static void test_check(void)
 
 static void test_list(void)
 {
-	struct node *tmp;
-	struct node **cursor;
+	struct list_node *tmp;
+	struct list_node **cursor;
 	struct list *mylist = list_new(free);
 
 	list_push_front(mylist, strdup("1"));

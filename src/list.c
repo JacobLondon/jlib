@@ -8,8 +8,6 @@ struct list *list_new(void (*dtor)(void *buf))
 {
 	struct list *self;
 
-	assert(dtor);
-
 	self = malloc(sizeof(*self));
 	if (!self) {
 		return NULL;
@@ -40,9 +38,9 @@ cleanup:
 	free(self);
 }
 
-void list_remove(struct list *self, struct node *node)
+void list_remove(struct list *self, struct list_node *node)
 {
-	struct node **tmp;
+	struct list_node **tmp;
 
 	assert(self);
 	
@@ -57,7 +55,7 @@ void list_remove(struct list *self, struct node *node)
 			self->last = self->head;
 		}
 
-		if (node->value) {
+		if (self->dtor && node->value) {
 			self->dtor(node->value);
 		}
 		(void)memset(node, 0, sizeof(*node));
@@ -80,7 +78,7 @@ void list_remove(struct list *self, struct node *node)
 					self->last = NULL;
 				}
 
-				if (node->value) {
+				if (self->dtor && node->value) {
 					self->dtor(node->value);
 				}
 				(void)memset(node, 0, sizeof(*node));
@@ -91,9 +89,9 @@ void list_remove(struct list *self, struct node *node)
 	}
 }
 
-struct node *list_find(struct list *self, void *query, int (*cmp)(void *value, void *query))
+struct list_node *list_find(struct list *self, void *query, int (*cmp)(void *value, void *query))
 {
-	struct node **tmp;
+	struct list_node **tmp;
 
 	assert(self);
 	assert(cmp);
@@ -107,13 +105,13 @@ struct node *list_find(struct list *self, void *query, int (*cmp)(void *value, v
 	return NULL;
 }
 
-struct node *list_push_front(struct list *self, void *value)
+struct list_node *list_push_front(struct list *self, void *value)
 {
 	assert(self);
 	return list_insert_next(self, NULL, value);
 }
 
-struct node *list_push_back(struct list *self, void *value)
+struct list_node *list_push_back(struct list *self, void *value)
 {
 	assert(self);
 	return list_insert_next(self, self->last, value);
@@ -131,9 +129,9 @@ void list_pop_back(struct list *self)
 	list_remove(self, self->last);
 }
 
-struct node *list_insert_next(struct list *self, struct node *previous, void *value)
+struct list_node *list_insert_next(struct list *self, struct list_node *previous, void *value)
 {
-	struct node *node;
+	struct list_node *node;
 
 	assert(self);
 
@@ -169,13 +167,27 @@ struct node *list_insert_next(struct list *self, struct node *previous, void *va
 	return node;
 }
 
-struct node *list_head(struct list *self)
+void list_take(struct list *self, struct list *other)
+{
+	assert(self);
+	assert(other);
+	assert(self->dtor == other->dtor); // must contain the same type
+
+	self->last->next = other->head;
+	self->last = other->last;
+	self->size += other->size;
+
+	(void)memset(other, 0, sizeof(*other));
+	free(other);
+}
+
+struct list_node *list_head(struct list *self)
 {
 	assert(self);
 	return self->head;
 }
 
-struct node *list_tail(struct list *self)
+struct list_node *list_tail(struct list *self)
 {
 	assert(self);
 	if (self->head) {
@@ -185,13 +197,13 @@ struct node *list_tail(struct list *self)
 	return NULL;
 }
 
-struct node *list_last(struct list *self)
+struct list_node *list_last(struct list *self)
 {
 	assert(self);
 	return self->last;
 }
 
-struct node *list_iterate(struct list *self, struct node *current)
+struct list_node *list_iterate(struct list *self, struct list_node *current)
 {
 	assert(self);
 
@@ -202,32 +214,32 @@ struct node *list_iterate(struct list *self, struct node *current)
 	return current->next;
 }
 
-struct node **list_iter_begin(struct list *self)
+struct list_node **list_iter_begin(struct list *self)
 {
 	assert(self);
 	return &self->head;
 }
 
-void list_iter_continue(struct node ***current)
+void list_iter_continue(struct list_node ***current)
 {
 	assert(current);
 
 	*current = &(**current)->next;
 }
 
-int list_iter_done(struct node **current)
+int list_iter_done(struct list_node **current)
 {
 	assert(current);
 	return !(*current);
 }
 
-void *list_iter_value(struct node **current)
+void *list_iter_value(struct list_node **current)
 {
 	assert(current);
 	return (*current)->value;
 }
 
-struct node *list_iter_next(struct node **current)
+struct list_node *list_iter_next(struct list_node **current)
 {
 	assert(current);
 	return (*current)->next;
