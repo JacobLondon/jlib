@@ -21,12 +21,14 @@ OBJ_FILES=\
 	src/tree.o \
 	src/util.o
 
+FILES=$(wildcard src/*.c)
+
 .PHONY: clean
 
 $(TARGET): test.o jlib.a
 	$(CC) -o $@ $^ $(CFLAGS)
 
-test.o: src/test.c
+test.o: test/test.c
 	$(CC) -c $< -o $@ $(CFLAGS)
 
 jlib.a: $(OBJ_FILES)
@@ -40,3 +42,6 @@ parse: parse.o jlib.a
 
 clean:
 	rm -rf $(TARGET) $(OBJ_FILES) *.a *.o
+
+tcc:
+	tcc -o $(TARGET) $(FILES) test/parse.c -Iinclude/ -Wall -Wextra -ggdb
