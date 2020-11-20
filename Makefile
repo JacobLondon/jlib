@@ -32,5 +32,11 @@ test.o: src/test.c
 jlib.a: $(OBJ_FILES)
 	ar rcs $@ $^
 
+parse.o: test/parse.c
+	$(CC) -c $< -o $@ $(CFLAGS)
+
+parse: parse.o jlib.a
+	$(CC) -o $@ $^ $(CFLAGS)
+
 clean:
 	rm -rf $(TARGET) $(OBJ_FILES) *.a *.o

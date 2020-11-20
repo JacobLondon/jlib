@@ -515,6 +515,53 @@ static void test_tok(void)
 	free(text);
 }
 
+static void test_tree_puts(void *value, size_t depth)
+{
+	char *str = (char *)value;
+	assert(value);
+
+	for ( ; depth > 0; depth--) {
+		printf("    ");
+	}
+	printf("%s\n", str);
+	fflush(stdout);
+}
+
+static void test_tree(void)
+{
+	struct tree_node *root = tree_node_new(strdup("Hello"));
+	struct tree_node *tmp;
+	struct tree_node *other;
+	tmp = tree_node_append(root, strdup("World"));
+	tree_node_append(tmp, strdup("Test"));
+	tree_node_append(tmp, strdup("1234"));
+	tmp = tree_node_prepend(root, strdup("Other"));
+	tree_node_append(tmp, strdup("Last"));
+
+	tmp = tree_node_find(root, "Other", (int (*)(void *, void *))strcmp);
+	if (tmp) {
+		printf("Found!\n");
+	}
+	else {
+		printf("Not found!\n");
+	}
+
+	other = tree_node_new(strdup("NEW BRANCH"));
+	tree_node_insert(tmp, other);
+
+	tree_node_map(root, test_tree_puts);
+
+	tmp = tree_node_find(root, "not here mate", (int (*)(void *, void *))strcmp);
+	if (tmp) {
+		printf("Found!\n");
+	}
+	else {
+		printf("Not found!\n");
+	}
+
+	tree_node_del(root, free);
+}
+
 static void test_timer(void)
 {
 	unsigned long i;
@@ -570,6 +617,8 @@ int main(int argc, char **argv)
 		test_token();
 	else if (arg_check(argc, argv, "--tok"))
 		test_tok();
+	else if (arg_check(argc, argv, "--tree"))
+		test_tree();
 	else if (arg_check(argc, argv, "--io"))
 		test_io();
 	else if (arg_check(argc, argv, "--list"))

@@ -3,6 +3,9 @@
 
 #include <jlib/tree.h>
 
+static int tree_node_ptr_cmp(void *lhs, void *rhs);
+static void map_helper(struct tree_node *root, void (*func)(void *value, size_t depth), size_t depth);
+
 static int tree_node_ptr_cmp(void *lhs, void *rhs)
 {
 	return (lhs == rhs) ? 0 : 1;
@@ -32,23 +35,23 @@ void tree_node_del(struct tree_node *self, void (*dtor)(void *value))
 		self->value = NULL;
 	}
 
-	// is a leaf node
-	if (!self->children) {
-		return;
+	// has children, clean them up
+	if (self->children) {
+		for (cursor = list_iter_begin(self->children);
+			!list_iter_done(cursor);
+			list_iter_continue(&cursor))
+		{
+			tree_node_del(list_iter_value(cursor), dtor);
+		}
+		list_free(self->children);
+		self->children = NULL;
 	}
 
-	// has children
-	for (cursor = list_iter_begin(self->children);
-	     !list_iter_done(cursor);
-	     list_iter_continue(&cursor))
-	{
-		tree_node_del(list_iter_value(cursor), dtor);
-	}
-	list_free(self->children);
+	self->parent = NULL;
 	free(self);
 }
 
-void tree_node_prepend(struct tree_node *self, void *value)
+struct tree_node *tree_node_prepend(struct tree_node *self, void *value)
 {
 	struct tree_node *node;
 	assert(self);
@@ -62,10 +65,12 @@ void tree_node_prepend(struct tree_node *self, void *value)
 		assert(self->children);
 	}
 
-	list_push_front(self->children, node);
+	node->parent = self;
+	(void)list_push_front(self->children, node);
+	return node;
 }
 
-void tree_node_append(struct tree_node *self, void *value)
+struct tree_node *tree_node_append(struct tree_node *self, void *value)
 {
 	struct tree_node *node;
 	assert(self);
@@ -79,7 +84,9 @@ void tree_node_append(struct tree_node *self, void *value)
 		assert(self->children);
 	}
 
-	list_push_back(self->children, node);
+	node->parent = self;
+	(void)list_push_back(self->children, node);
+	return node;
 }
 
 struct tree_node *tree_node_remove(struct tree_node *self, void (*dtor)(void *value))
@@ -126,6 +133,23 @@ struct tree_node *tree_node_remove(struct tree_node *self, void (*dtor)(void *va
 	return parent;
 }
 
+struct tree_node *tree_node_insert(struct tree_node *parent, struct tree_node *root)
+{
+	assert(parent);
+	assert(root);
+	assert(root->parent == NULL);
+
+	// turn leaf node into a parent
+	if (parent->children == NULL) {
+		parent->children = list_new(NULL); // manually free the items...
+		assert(parent->children);
+	}
+
+	root->parent = parent;
+	(void)list_push_back(parent->children, root);
+	return root;
+}
+
 struct tree_node *tree_node_find(struct tree_node *self, void *query, int (*cmp)(void *value, void *query))
 {
 	assert(self);
@@ -156,13 +180,32 @@ struct tree_node *tree_node_find(struct tree_node *self, void *query, int (*cmp)
 	return NULL;
 }
 
-void tree_node_swap(struct tree_node *self)
+void tree_node_map(struct tree_node *root, void (*func)(void *value, size_t depth))
 {
-	// TODO
+	assert(root);
+	assert(func);
+	map_helper(root, func, 0);
 }
 
-int tree_node_collect(struct tree_node *parent, int number)
+static void map_helper(struct tree_node *root, void (*func)(void *value, size_t depth), size_t depth)
 {
-	// TODO
-	return 0;
+	if (root->value) {
+		func(root->value, depth);
+	}
+
+	if (!root->children) {
+		return;
+	}
+
+	struct list_node **cursor;
+	struct tree_node *node;
+	for (cursor = list_iter_begin(root->children);
+	     !list_iter_done(cursor);
+	     list_iter_continue(&cursor))
+	{
+		node = list_iter_value(cursor);
+		if (node != NULL) {
+			map_helper(node, func, depth + 1);
+		}
+	}
 }

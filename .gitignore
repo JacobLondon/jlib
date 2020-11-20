@@ -6,3 +6,4 @@ jlibtest
 *.a
 test.py
 #*#
+parse

@@ -14,6 +14,7 @@
 #include "parray.h"
 #include "str.h"
 #include "tok.h"
+#include "tree.h"
 #include "timer.h"
 #include "util.h"
 
