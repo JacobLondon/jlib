@@ -203,6 +203,7 @@ done:
 	}
 	else {
 		tmp = calloc(bytes + 1, sizeof(char));
+		if (!tmp) return 0;
 		*buffer = tmp;
 	}
 	va_start(ap, format);
@@ -227,41 +228,28 @@ int strcat_safe(char *destination, char *source)
 
 int streq(const char *str0, const char *str1)
 {
-	size_t i;
-	for (i = 0; str0[i] || str1[i]; i++) {
-		if (str0[i] != str1[i])
-			return 0;
-	}
-	return 1;
+	return (strcmp(str0, str1) == 0);
 }
 
 #ifndef strdup
 char *strdup(const char *str)
 {
-	size_t i;
-	char *buf = calloc(strlen(str) + 1, sizeof(char));
-	if (!buf) {
-		return NULL;
-	}
-	for (i = 0; (buf[i] = str[i]); i++)
-		;
-	
+	size_t len = strlen(str);
+	char *buf = malloc(len + 1);
+	if (!buf) return NULL;
+	(void)memcpy(buf, str, len + 1); // copy NUL
 	return buf;
 }
 #endif /* strdup */
 
 char *strndup(const char *str, size_t n)
 {
-	size_t i;
 	size_t size = strlen(str);
 	size = size > n ? n : size;
-	char *buf = calloc(size + 1, sizeof(char));
-	if (!buf) {
-		return NULL;
-	}
-	for (i = 0; i < size; i++) {
-		buf[i] = str[i];
-	}
+	char *buf = malloc(size + 1);
+	if (!buf) return NULL;
+	(void)memcpy(buf, str, size);
+	buf[size] = 0; // manual NUL
 	return buf;
 }
 
