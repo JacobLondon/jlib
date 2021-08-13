@@ -593,46 +593,43 @@ static void test_mallog(void)
 
 int main(int argc, char **argv)
 {
-	if (arg_check(argc, argv, "--arg"))
-		test_arg();
-	else if (arg_check(argc, argv, "--astar"))
-		test_astar();
-	else if (arg_check(argc, argv, "--debug"))
-		test_debug();
-	else if (arg_check(argc, argv, "--farray"))
-		test_farray();
-	else if (arg_check(argc, argv, "--gc"))
-		test_gc();
-	else if (arg_check(argc, argv, "--parray"))
-		test_parray();
-	else if (arg_check(argc, argv, "--fmap"))
-		test_fmap();
-	else if (arg_check(argc, argv, "--py"))
-		test_py();
-	else if (arg_check(argc, argv, "--str"))
-		test_str();
-	else if (arg_check(argc, argv, "--timer"))
-		test_timer();
-	else if (arg_check(argc, argv, "--token"))
-		test_token();
-	else if (arg_check(argc, argv, "--tok"))
-		test_tok();
-	else if (arg_check(argc, argv, "--tree"))
-		test_tree();
-	else if (arg_check(argc, argv, "--io"))
-		test_io();
-	else if (arg_check(argc, argv, "--list"))
-		test_list();
-	else if (arg_check(argc, argv, "--mallog"))
-		test_mallog();
-	else if (arg_check(argc, argv, "--check"))
-		test_check();
-	else {
+	struct {
+		char *argument;
+		void (* run)(void);
+	} lookup[] = {
+		{"--arg", test_arg},
+		{"--astar", test_astar},
+		{"--debug", test_debug},
+		{"--farray", test_farray},
+		{"--gc", test_gc},
+		{"--parray", test_parray},
+		{"--py", test_py},
+		{"--str", test_str},
+		{"--timer", test_timer},
+		{"--token", test_token},
+		{"--tok", test_tok},
+		{"--tree", test_tree},
+		{"--io", test_io},
+		{"--list", test_list},
+		{"--mallog", test_mallog},
+		{"--check", test_check},
+		{NULL, NULL}
+	};
+
+	int i;
+	for (i = 0; lookup[i].argument; i++) {
+		if (arg_check(argc, argv, lookup[i].argument)) {
+			lookup[i].run();
+			break;
+		}
+	}
+
+	if (!lookup[i].argument) {
 		puts("\
-Usage:\n--arg\n--astar\n--debug\n\
---farray\n--parray\n--py\n--fmap\n\
---str\n--timer\n--io\n--list\n--mallog\n\
---token\n");
+	Usage:\n--arg\n--astar\n--debug\n\
+	--farray\n--parray\n--py\n--fmap\n\
+	--str\n--timer\n--io\n--list\n--mallog\n\
+	--token\n");
 	}
 
 	return 0;
