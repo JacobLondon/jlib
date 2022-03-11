@@ -22,11 +22,11 @@ static void test_arg(void)
 	} defs;
 
 	/* get args */
-	defs.c = arg_check(argc, argv, "-c");
-	defs.v = arg_check(argc, argv, "-v");
+	defs.c = arg_check(argc, argv, "-c", NULL);
+	defs.v = arg_check(argc, argv, "-v", NULL);
 
 	char *tmp;
-	if ((tmp = arg_get(argc, argv, "--count"))) {
+	if ((tmp = arg_get(argc, argv, NULL, "--count"))) {
 		(void)sscanf(tmp, "%d", &defs.count_num);
 	}
 	else
@@ -593,43 +593,45 @@ static void test_mallog(void)
 
 int main(int argc, char **argv)
 {
+	int i, found;
+	found = 0;
 	struct {
+		char *a;
 		char *argument;
 		void (* run)(void);
 	} lookup[] = {
-		{"--arg", test_arg},
-		{"--astar", test_astar},
-		{"--debug", test_debug},
-		{"--farray", test_farray},
-		{"--gc", test_gc},
-		{"--parray", test_parray},
-		{"--py", test_py},
-		{"--str", test_str},
-		{"--timer", test_timer},
-		{"--token", test_token},
-		{"--tok", test_tok},
-		{"--tree", test_tree},
-		{"--io", test_io},
-		{"--list", test_list},
-		{"--mallog", test_mallog},
-		{"--check", test_check},
-		{NULL, NULL}
+		{"-a", "--arg", test_arg},
+		{"-s", "--astar", test_astar},
+		{"-d", "--debug", test_debug},
+		{"-f", "--farray", test_farray},
+		{"-g", "--gc", test_gc},
+		{"-p", "--parray", test_parray},
+		{"-y", "--py", test_py},
+		{"-c", "--str", test_str},
+		{"-t", "--timer", test_timer},
+		{"-k", "--token", test_token},
+		{"-o", "--tok", test_tok},
+		{"-r", "--tree", test_tree},
+		{"-i", "--io", test_io},
+		{"-l", "--list", test_list},
+		{"-m", "--mallog", test_mallog},
+		{"-e", "--check", test_check},
+		{NULL, NULL, NULL}
 	};
 
-	int i;
 	for (i = 0; lookup[i].argument; i++) {
-		if (arg_check(argc, argv, lookup[i].argument)) {
+		if (arg_check(argc, argv, lookup[i].a, lookup[i].argument)) {
+			printf("Running: %s, %s\n", lookup[i].a, lookup[i].argument);
 			lookup[i].run();
-			break;
+			found += 1;
 		}
 	}
 
-	if (!lookup[i].argument) {
-		puts("\
-	Usage:\n--arg\n--astar\n--debug\n\
-	--farray\n--parray\n--py\n--fmap\n\
-	--str\n--timer\n--io\n--list\n--mallog\n\
-	--token\n");
+	if (!found) {
+		puts("Usage:");
+		for (i = 0; lookup[i].argument; i++) {
+			printf("%s, %s\n", lookup[i].a, lookup[i].argument);
+		}
 	}
 
 	return 0;

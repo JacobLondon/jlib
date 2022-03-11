@@ -2,24 +2,61 @@
 
 #include <jlib/arg.h>
 
-int arg_check(int argc, char **argv, const char *arg)
+#define DELVE_DIDNT_FIND_IT -1
+
+static int delve(int argc, char **argv, const char *da, const char *ddarg);
+
+int arg_check(int argc, char **argv, const char *da, const char *ddarg)
 {
-	int i;
-	for (i = 0; i < argc; i++) {
-		if (strcmp(argv[i], arg) == 0) {
-			return 1;
-		}
+	int found;
+	found = delve(argc, argv, da, ddarg);
+	if (found == DELVE_DIDNT_FIND_IT) {
+		return 0;
 	}
-	return 0;
+	return found;
 }
 
-char *arg_get(int argc, char **argv, const char *arg)
+char *arg_get(int argc, char **argv, const char *da, const char *ddarg)
 {
-	int i;
+	int found;
+	found = delve(argc, argv, da, ddarg);
+	if ( (found == DELVE_DIDNT_FIND_IT) || ( (found + 1) >= argc) ) {
+		return NULL;
+	}
+	return argv[found + 1];
+}
+
+static int delve(int argc, char **argv, const char *da, const char *ddarg)
+{
+	int i, found;
+	const char *current;
+
+	if (!da && !ddarg)
+	{
+		goto miss;
+	}
+
 	for (i = 0; i < argc; i++) {
-		if ((strcmp(argv[i], arg) == 0) && (i + 1 < argc)) {
-			return argv[i + 1];
+		current = argv[i];
+		found =
+			(da && (strcmp(current, da) == 0) ) ||
+			(ddarg && (strcmp(current, ddarg) == 0) );
+
+		/* look for -alghfibcd like things */
+		if (!found &&
+		    da &&
+		    (current[0] == '-') &&
+		    (current[1] != '-') &&
+		    (current[1] != '\0') )
+		{
+			found = (strchr(current, da[1]) != NULL);
+		}
+
+		if (found) {
+			return i;
 		}
 	}
-	return NULL;
+
+miss:
+	return DELVE_DIDNT_FIND_IT;
 }
