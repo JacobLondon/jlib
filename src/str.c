@@ -213,22 +213,31 @@ done:
 	#undef X_FORMAT
 }
 
-int strcat_safe(char *destination, char *source)
+char *strallocat(char *destination, char *source)
 {
-	size_t size = strlen(destination) + strlen(source);
-	void *tmp = realloc(destination, size + 1);
-	if (!tmp) {
-		return 0;
+	if (!destination && !source) {
+		return NULL;
 	}
+	size_t size = 0;
+	size += destination ? strlen(destination) : 0;
+	size += source ? strlen(source) : 0;
+
+	void *tmp;
+	if (!destination) {
+		tmp = malloc(size + 1);
+	}
+	else {
+		tmp = realloc(destination, size + 1);
+	}
+
+	if (!tmp) {
+		return NULL;
+	}
+
 	destination = tmp;
 	(void)strcat(destination, source);
 	destination[size] = '\0';
-	return 1;
-}
-
-int streq(const char *str0, const char *str1)
-{
-	return (strcmp(str0, str1) == 0);
+	return destination;
 }
 
 #ifndef strdup
@@ -251,6 +260,25 @@ char *strndup(const char *str, size_t n)
 	(void)memcpy(buf, str, size);
 	buf[size] = 0; // manual NUL
 	return buf;
+}
+
+#ifndef strlcpy
+size_t strlcpy(char *dest, const char *src, size_t size)
+{
+	size_t len = strlen(src);
+	strncpy(dest, src, size);
+	if (size > 0)
+		dest[size - 1]= '\0';
+	return (len > size) ? size : len;
+}
+#endif
+
+char *xstrlcpy(char *dest, const char *src, size_t size)
+{
+	strncpy(dest, src, size);
+	if (size > 0)
+		dest[size - 1]= '\0';
+	return dest;
 }
 
 char **strsplit(char *s, const char *fmt)
@@ -365,7 +393,7 @@ int streplace(char **s, const char *old, const char *new)
 	return 1;
 }
 
-char *strin(char *haystack, char *needles)
+char *strchrany(char *haystack, char *needles)
 {
 	char *p, *ret;
 	
@@ -385,15 +413,32 @@ char *strin(char *haystack, char *needles)
 
 int strstarts(char *str, char *sub)
 {
-	assert(str);
-	if (!sub) {
-		return 0;
-	}
+	size_t str_len = strlen(str);
+	size_t sub_len = strlen(sub);
+	str_len = (str_len > sub_len) ? sub_len : str_len;
+	return (strncmp(str, sub, str_len) == 0);
+}
 
-	if (strstr(str, sub) == str) {
-		return 1;
-	}
-	return 0;
+int strnstarts(char *str, char *sub, size_t sub_len)
+{
+	size_t str_len = strlen(str);
+	str_len = (str_len > sub_len) ? sub_len : str_len;
+	return (strncmp(str, sub, str_len) == 0);
+}
+
+int strcasestarts(char *str, char *sub)
+{
+	size_t str_len = strlen(str);
+	size_t sub_len = strlen(sub);
+	str_len = (str_len > sub_len) ? sub_len : str_len;
+	return (strcasecmp(str, sub) == 0);
+}
+
+int strncasestarts(char *str, char *sub, size_t sub_len)
+{
+	size_t str_len = strlen(str);
+	str_len = (str_len > sub_len) ? sub_len : str_len;
+	return (strncasecmp(str, sub, str_len) == 0);
 }
 
 int strends(char *str, char *sub)
@@ -407,6 +452,110 @@ int strends(char *str, char *sub)
 		return 1;
 	}
 	return 0;
+}
+
+char *strstre(char *haystack, char *needle)
+{
+	if (!haystack || !needle) {
+		return NULL;
+	}
+
+	char *p = strstr(haystack, needle);
+	if (!p) {
+		return NULL;
+	}
+
+	return &p[strlen(needle)];
+}
+
+char *strchre(char *haystack, char needle)
+{
+	if (!haystack) {
+		return NULL;
+	}
+
+	char *p = strchr(haystack, needle);
+	if (!p) {
+		return NULL;
+	}
+
+	return &p[1];
+}
+
+char *strchr_space(char *string)
+{
+	if (!string) {
+		return NULL;
+	}
+
+	while (*string && !isspace(*string)) {
+		string++;
+	}
+	return string;
+}
+
+char *strpass_space(char *string)
+{
+	if (!string) {
+		return NULL;
+	}
+
+	while (isspace(*string)) {
+		string++;
+	}
+
+	return string;
+}
+
+char *strpass_alnum(char *string)
+{
+	if (!string) {
+		return NULL;
+	}
+
+	while (isalnum(*string)) {
+		string++;
+	}
+
+	return string;
+}
+
+char *strpass_words(char *string, int words_to_pass)
+{
+	if (!string) {
+		return NULL;
+	}
+
+	while (string && (words_to_pass > 0)) {
+		string = strpass_space(string);
+		string = strchr_space(string);
+	}
+	string = strpass_space(string);
+	return string;
+}
+
+void strtrimspaces(char *string, char *out, size_t out_len)
+{
+	if (!string || !out) {
+		return;
+	}
+
+	int inspace = 0;
+	size_t i, j;
+	for (i = 0, j = 0; string[i] && (j < out_len); i++) {
+		if (isspace(string[i])) {
+			if (inspace == 0) {
+				out[j] = ' ';
+				j++;
+				inspace = 1;
+			}
+		}
+		else {
+			out[j] = string[i];
+			j++;
+			inspace = 0;
+		}
+	}
 }
 
 #if 0

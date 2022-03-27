@@ -21,15 +21,26 @@
 int strcatf(char **buffer, const char *format, ...);
 
 /**
- * Always reallocs to guarantee sizing
+ * Like strcat but reallocs. Either destination/source can be NULL
+ * Both NULL returns NULL
  */
-int strcat_safe(char *destination, char *source);
+char *strallocat(char *destination, char *source);
 
-int streq(const char *str0, const char *str1);
+#define streq(str0, str1) (strcmp((str0), (str1)) == 0)
+#define strcaseeq(str0, str1) (strcasecmp((str0), (str1)) == 0)
+
 #ifndef strdup
 char *strdup(const char *str);
 #endif /* strdup */
 char *strndup(const char *str, size_t n);
+
+#ifndef strlcpy
+/**
+ * Slower than xstrlcpy as it needs to get the number of bytes written
+ */
+size_t strlcpy(char *dest, const char *src, size_t size);
+#endif
+char *xstrlcpy(char *dest, const char *src, size_t size);
 
 /** 
  * Split a string by the fmt string.
@@ -50,17 +61,43 @@ int streplace(char **s, const char *old, const char *new);
  * Similar to strstr, but returns the first pointer to any
  * of the needles in the haystack
  */
-char *strin(char *haystack, char *needles);
+char *strchrany(char *haystack, char *needles);
 
 /**
  * Return 1 if str starts with sub, else 0
  */
+
 int strstarts(char *str, char *sub);
+int strnstarts(char *str, char *sub, size_t sub_len);
+#define STRNSTARTS(str, literal) strnstarts((str), literal, sizeof(literal) - 1)
+
+int strcasestarts(char *str, char *sub);
+int strncasestarts(char *str, char *sub, size_t sub_len);
+#define STRNCASESTARTS(str, literal) (strncasecmp((str), literal, sizeof(literal) - 1) == 0)
 
 /**
  * Return 1 if str ends with sub, else 0
  */
 int strends(char *str, char *sub);
+
+/**
+ * like VIM's /search/e, return pointer at the end of the match if found or NULL
+ */
+char *strstre(char *haystack, char *needle);
+char *strchre(char *haystack, char needle);
+
+/**
+ * Assuming *string isspace, move forward until there is no space, and get that char
+ */
+char *strchr_space(char *string); // find first space char
+char *strpass_space(char *string); // pass space until first non-space char
+char *strpass_alnum(char *string); // pass alnum until anything else
+char *strpass_words(char *string, int words_to_pass);
+
+/**
+ * Replace multiples of spacing with a single space
+ */
+void strtrimspaces(char *string, char *out, size_t out_len);
 
 /**
  * Return 0 if re has a match in str, else Regex error code.
